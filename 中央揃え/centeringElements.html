@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link href="../css/reset.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="container-border">
+        <p class="content-main-title">text-align、align-items、justify-content、vertical-alignの違い</p>
+        <div class="content-item">
+          <p class="content-item-style-name">text-align</p>
+          <p class="content-item-style-explanation">text-alignは<br>ブロック要素におけるインラインレベル(中身)コンテンツの水平方向の配置を設定する。</p>
+          <p class="content-item-style-example">例）text-align: center;</p>
+          <pre class="pre-tag">
+
+&lt;div style="text-align: center;"&gt;text-align: center;&lt;/div&gt;
+          </pre>
+          <p class="content-item-style-example-answer">結果</p>
+          <div class="content-item-style-example-answer-box" style="text-align: center;">text-align: center;</div>
+        </div>
+
+        <div class="content-item">
+          <p class="content-item-style-name">align-items</p>
+          <p class="content-item-style-explanation">align-itemsは<br>flexアイテムを縦軸で見たときに上下のどこで揃えるかを指定するプロパティある。</p>
+          <p class="content-item-style-example">例）align-items: center;</p>
+          <pre class="pre-tag">
+            
+&lt;div class="content-item-style-example-answer-box" style="display: flex; align-items: center;"&gt;
+  &lt;p style="font-size: large;"&gt;align-items: center;&lt;/p&gt;
+  &lt;p&gt;align-items: center;&lt;/p&gt;
+&lt;/div&gt;
+          </pre>
+          <p class="content-item-style-example-answer">結果※下の例はalign-itemsがない場合</p>
+          <div class="content-item-style-example-answer-box" style="display: flex; align-items: center;">
+            <p style="font-size: large;">align-items: center;</p>
+            <p>align-items: center;</p>
+          </div>
+          <div class="content-item-style-example-answer-box" style="display: flex;">
+            <p style="font-size: large;">align-items: center;</p>
+            <p>align-items: center;</p>
+          </div>
+        </div>
+
+        <div class="content-item">
+          <p class="content-item-style-name">justify-content</p>
+          <p class="content-item-style-explanation">justify-contentは<br>フレックスコンテナーの主軸およびグリッドコンテナーのインライン軸に沿って、中身のアイテムの間や周囲に間隔を配置する。</p>
+          <p class="content-item-style-example">例）justify-content: center;</p>
+          <pre class="pre-tag">
+
+&lt;div style="justify-content: center;"&gt;justify-contents: center;&lt;/div&gt;
+          </pre>
+          <p class="content-item-style-example-answer">結果</p>
+          <div class="content-item-style-example-answer-box" style="display: flex; justify-content: center;">justify-content: center;</div>
+        </div>
+
+        <div class="content-item">
+          <p class="content-item-style-name">vertical-align</p>
+          <p class="content-item-style-explanation">vertical-alignは<br>インラインボックス、インラインブロック、表セルボックスの垂直方向に配置する。</p>
+          <p class="content-item-style-example">例）vertical-align: center;</p>
+          <pre class="pre-tag">
+
+&lt;div class="content-item-style-example-answer-box" style="display:inline-block;height:150px;vertical-align: middle;"&gt;
+    &lt;span style="font-size: large;"&gt;vertical-align&lt;/span&gt;
+&lt;/div&gt;
+          </pre>
+          <p class="content-item-style-example-answer">結果※右の例はvertical-alignがない場合</p>
+          <div class="content-item-style-example-answer-box" style="display:inline-block;height:150px;vertical-align: middle;">
+            <span style="font-size: large;">vertical-align</span>
+          </div>
+          <div class="content-item-style-example-answer-box" style="display:inline-block;height:150px;">
+            <span style="font-size: large;">vertical-align</span>
+          </div>
+        </div>
+      </div>
+    </div>
+<style>
+
+.container {
+  margin: 0 20%;
+}
+
+.container-border{
+    border-right: 6px solid #f5f5f5;
+    border-left: 6px solid #f5f5f5;
+    padding:0 20px;
+  }
+
+.content-item{
+  margin-bottom:12px;
+  border-bottom:2px solid #f5f5f5; 
+}  
+
+.content-main-title{
+  text-align: center;
+  padding-top:20px;
+}  
+
+.content-item-style-name{
+  font-size: 20px;
+}
+
+.content-item-style-explanation{
+  margin:12px 0;
+}
+
+.content-item-style-example{
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.content-item-style-example-answer{
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.pre-tag {
+      background-color: #f5f5f5;
+      white-space: pre-wrap;
+      border-radius: 5px; 
+      box-shadow: 0 2px 1px #f5f5f5;
+      margin:12px 0;
+    }
+
+.content-item-style-example-answer-box{
+  background-color: #f5f5f5;
+      white-space: pre-wrap;
+      border-radius: 5px; 
+      box-shadow: 0 2px 1px #f5f5f5;
+      padding:10px 0;
+      margin:12px 0;
+}    
+</style>
+ 
+  </body>
+</html>
