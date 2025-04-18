@@ -1,0 +1,76 @@
+.header{
+  max-width: 960px;
+  margin:60px auto 0px auto;
+  padding-bottom:20px;
+  border-bottom: 1px solid #EEEEEE;
+  position: relative;
+
+  &__title{
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+  }
+  &__button_regist{
+    padding:5px 8px;
+    background-color: skyblue;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    position: absolute;
+    bottom:16px;
+    left:95%;
+
+    &:hover{
+      opacity: 0.5;
+      transition:all 0.3s;
+    }
+  }
+
+}
+
+.main{
+  margin-top:20px;
+
+  &__content{
+    font-size: 32px;
+    margin:0 15%;
+    &__col{
+      display: flex;
+      margin-bottom: 10px;
+    }
+    &__area{
+      display: flex;
+    }
+    li{
+      text-align: center;
+      width: 200px;
+      border: 2px solid #333333;
+    }
+    &__row{
+      display: flex;
+      
+      &__button_edit{
+        border-radius: 5px;
+        padding:5px 16px;
+        text-decoration: none;
+        background-color: skyblue;
+        color: #ffffff;
+        &:hover{
+          opacity: 0.5;
+          transition:all 0.3s;
+        }
+      }
+      &__button_delete{
+        border-radius: 5px;
+        padding:5px 16px;
+        text-decoration: none;
+        background-color: red;
+        color: #ffffff;
+        &:hover{
+          opacity: 0.5;
+          transition:all 0.3s;
+        }
+      }
+    }
+  }
+}

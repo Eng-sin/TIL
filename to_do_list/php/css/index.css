@@ -1,0 +1,71 @@
+.header {
+  max-width: 960px;
+  margin: 60px auto 0px auto;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #EEEEEE;
+  position: relative;
+}
+.header__title {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+.header__button_regist {
+  padding: 5px 8px;
+  background-color: skyblue;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 5px;
+  position: absolute;
+  bottom: 16px;
+  left: 95%;
+}
+.header__button_regist:hover {
+  opacity: 0.5;
+  transition: all 0.3s;
+}
+
+.main {
+  margin-top: 20px;
+}
+.main__content {
+  font-size: 32px;
+  margin: 0 15%;
+}
+.main__content__col {
+  display: flex;
+  margin-bottom: 10px;
+}
+.main__content__area {
+  display: flex;
+}
+.main__content li {
+  text-align: center;
+  width: 200px;
+  border: 2px solid #333333;
+}
+.main__content__row {
+  display: flex;
+}
+.main__content__row__button_edit {
+  border-radius: 5px;
+  padding: 5px 16px;
+  text-decoration: none;
+  background-color: skyblue;
+  color: #ffffff;
+}
+.main__content__row__button_edit:hover {
+  opacity: 0.5;
+  transition: all 0.3s;
+}
+.main__content__row__button_delete {
+  border-radius: 5px;
+  padding: 5px 16px;
+  text-decoration: none;
+  background-color: red;
+  color: #ffffff;
+}
+.main__content__row__button_delete:hover {
+  opacity: 0.5;
+  transition: all 0.3s;
+}/*# sourceMappingURL=index.css.map */
