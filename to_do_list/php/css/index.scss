@@ -23,49 +23,72 @@
     &:hover{
       opacity: 0.5;
       transition:all 0.3s;
+    }  
+  }
+    &__button_output__csv{
+    padding:5px 8px;
+    background-color: #CCCCCC;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    border:1px solid #CCCCCC;
+    position: absolute;
+    bottom:16px;
+    left:75%;
+
+    &:hover{
+      opacity: 0.5;
+      transition:all 0.3s;
     }
   }
-
 }
 
 .main{
   margin-top:20px;
-
+  display: flex;
+  justify-content: center;
+  align-items: center;
   &__content{
     font-size: 32px;
-    margin:0 15%;
-    &__col{
-      display: flex;
-      margin-bottom: 10px;
-    }
-    &__area{
-      display: flex;
-    }
-    li{
+    margin:0 10%;
+    &__columns th{
       text-align: center;
-      width: 200px;
+    }
+    &__columns__add__border{
       border: 2px solid #333333;
     }
-    &__row{
-      display: flex;
-      
+    &__row{ 
+      text-align: center;
+      margin-left: 20px;
+      td{
+        text-align: center;
+      }
+      &__add__border{
+        border: 2px solid #333333;
+      }
       &__button_edit{
+        vertical-align: middle;
+        width: 100%;
+        border: 1px solid skyblue;
         border-radius: 5px;
-        padding:5px 16px;
         text-decoration: none;
         background-color: skyblue;
         color: #ffffff;
+        padding:5px 16px;
         &:hover{
           opacity: 0.5;
           transition:all 0.3s;
         }
       }
       &__button_delete{
+        width: 100%;
         border-radius: 5px;
         padding:5px 16px;
         text-decoration: none;
         background-color: red;
+        border: 1px solid red;
         color: #ffffff;
+        vertical-align: middle;
         &:hover{
           opacity: 0.5;
           transition:all 0.3s;
@@ -74,3 +97,5 @@
     }
   }
 }
+
+
