@@ -1,0 +1,105 @@
+<?php
+
+function showDetail()
+{
+  require_once('config.php');
+  global $deadlineDate, $content, $taskStatus, $priority, $row, $columns;
+
+  $deadlineDate = "";
+  $content = "";
+  $taskStatus = "";
+  $priority = "";
+
+  if (isset($_GET['task_id'])) {
+    $taskId = $_GET['task_id'];
+  } else {
+    die("タスクIDが指定されていません");
+  }
+
+  $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+  if (mysqli_connect_error()) {
+    die("データベースの接続に失敗しました");
+  }
+
+  $stmt = $mysqli->prepare("SELECT * FROM t_todo WHERE task_id = ?");
+  $stmt->bind_param("i", $taskId);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  if (!$result) {
+    die("クエリの実行に失敗しました: " . $mysqli->error);
+  }
+  $row = $result->fetch_assoc();
+
+  $stmt = $mysqli->prepare("SELECT * FROM t_memo WHERE task_id = ?");
+  $stmt->bind_param("i", $taskId);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  if (!$result) {
+    die("クエリの実行に失敗しました: " . $mysqli->error);
+  }
+  $columns = $result->fetch_all(MYSQLI_ASSOC);
+  mysqli_close($mysqli);
+}
+
+
+showDetail();
+
+?>
+
+
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To Do List</title>
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/detail.css">
+</head>
+
+<body>
+  <header class="header">
+    <p class="header__title">タスク詳細</p>
+    <a class="back__home" href="index.php">戻る</a>
+  </header>
+  <div class="detail__items">
+    <div class="detail__item">
+      <p class="detail__item__title">締め切り日付</p>
+      <p class="detail__item__explain"><?php echo htmlspecialchars($row['deadline_date'], ENT_QUOTES, 'UTF-8') ?></p>
+    </div>
+    <div class="detail__item">
+      <p class="detail__item__title">内容</p>
+      <p class="detail__item__explain"><?php echo htmlspecialchars($row['content'], ENT_QUOTES, 'UTF-8') ?></p>
+    </div>
+    <div class="detail__item">
+      <p class="detail__item__title">進捗状況</p>
+      <p class="detail__item__explain"><?php echo htmlspecialchars($row['task_status'], ENT_QUOTES, 'UTF-8') ?></p>
+    </div>
+    <div class="detail__item">
+      <p class="detail__item__title">優先度</p>
+      <p class="detail__item__explain"><?php echo htmlspecialchars($row['priority'], ENT_QUOTES, 'UTF-8') ?></p>
+    </div>
+  </div>
+
+  <p class="memo__title">メモ一覧</p>
+  <?php if (!empty($columns)): ?>
+  <div class="memo">
+    <div class="memo__items">
+      <?php foreach ($columns as $memo): ?>
+      <div class="memo__item">
+        <p class="memo__item__explain"><?php echo htmlspecialchars($memo['memo'], ENT_QUOTES, 'UTF-8'); ?></p>
+      </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+  <?php else: ?>
+  <div class="memo__items">
+    <div class="memo__item">
+      <p class="memo__item__explain">メモはありません。</p>
+    </div>
+  </div>
+  <?php endif; ?>
+</body>
+
+</html>
