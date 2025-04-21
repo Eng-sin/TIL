@@ -56,10 +56,10 @@ mysqli_close($mysqli);
             $column['task_status'] === '進行中' ? ' main__content__status__progress' : ($column['task_status'] === '完了' ? ' main__content__status__complete' : '');
           ?>
         <td>
-          <form class="main__content__row" action="show_detail.php" method="post">
+          <form class="main__content__row" action="show-detail.php" method="get">
             <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
-              name=" task_id">
-            <button type="submit" class="main__content__row__button_detail" name="detail_button">詳細</button>
+              name="task_id">
+            <button type="submit" class="main__content__row__button_detail">詳細</button>
           </form>
         </td>
         <td class="main__content__row__add__border<?php echo $statusClass ?>">
@@ -99,13 +99,3 @@ mysqli_close($mysqli);
 </body>
 
 </html>
-
-
-
-<?php if ($column['task_status'] == '進行中') {
-  echo '<td class="main__content__status__progress main__content__row__add__border"';
-} else if ($column['task_status'] == '完了') {
-  echo '<td class="main__content__status__complete main__content__row__add__border"';
-} else {
-  echo '<td class="main__content__row__add__border"';
-} ?>
