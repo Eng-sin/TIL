@@ -1,20 +1,39 @@
 <?php
-require_once('config.php');
-$deadlineDate = "";
-$content = "";
-$taskStatus = "";
-$priority = "";
 
+global $result;
+require_once('config.php');
 $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-if (mysqli_connect_error()) {
-  die("データベースの接続に失敗しました");
+if ($mysqli->connect_error) {
+  die("データベースの接続に失敗しました: " . $mysqli->connect_error);
 }
-$sql = "select * from t_todo order by field(task_status,'未着手','進行中','完了'),deadline_date,field(priority,'高','中','低')";
-$result = $mysqli->query($sql);
-if (!$result) {
+
+if (isset($_POST["hidden_complete_flg"])) {
+  $sql = "SELECT * FROM t_todo where task_status in ('未着手','進行中')
+          ORDER BY 
+            FIELD(task_status,'未着手','進行中'),
+            deadline_date,
+            FIELD(priority,'高','中','低')";
+} else {
+  $sql = "SELECT * FROM t_todo 
+          ORDER BY 
+            FIELD(task_status,'未着手','進行中','完了'),
+            deadline_date,
+            FIELD(priority,'高','中','低')";
+}
+
+
+
+$results = $mysqli->query($sql);
+if (!$results) {
   die("クエリの実行に失敗しました: " . $mysqli->error);
 }
-mysqli_close($mysqli);
+$result = [];
+while ($row = $results->fetch_assoc()) {
+  $result[] = $row;
+}
+$mysqli->close();
+
+
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +54,10 @@ mysqli_close($mysqli);
       <button type="submit" class="header__button_output__csv" name="output_csv">csvエクスポート
       </button>
     </form>
-
+    <form method="post">
+      完了済のタスクを非表示<input type="checkbox" id="hidden_complete_flg" name="hidden_complete_flg"
+        onchange="this.form.submit()" <?php echo isset($_POST["hidden_complete_flg"]) ? "checked" : ""; ?>>
+    </form>
     <a href="new_regist.php" class="header__button_regist">登録</a>
   </header>
   <div class="main">
@@ -96,6 +118,7 @@ mysqli_close($mysqli);
       <?php endforeach; ?>
     </table>
   </div>
+
 </body>
 
 </html>
