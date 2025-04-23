@@ -45,6 +45,8 @@ $mysqli->close();
   <title>To Do List</title>
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/index.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
 </head>
 
 <body>
@@ -111,7 +113,8 @@ $mysqli->close();
           <form class="main__content__row" action="delete.php" method="post">
             <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
               name=" task_id">
-            <button type="submit" class="main__content__row__button_delete" name="delete_button">削除</button>
+            <button type="submit" class="main__content__row__button_delete" name="delete_button"><i class="fas fa-trash"
+                aria-hidden="true"></i></button>
           </form>
         </td>
       </tr>
