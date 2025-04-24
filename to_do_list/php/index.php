@@ -1,6 +1,6 @@
 <?php
 
-global $result;
+global $result, $taskCount;
 require_once('config.php');
 $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 if ($mysqli->connect_error) {
@@ -21,8 +21,6 @@ if (isset($_POST["hidden_complete_flg"])) {
             FIELD(priority,'高','中','低')";
 }
 
-
-
 $results = $mysqli->query($sql);
 if (!$results) {
   die("クエリの実行に失敗しました: " . $mysqli->error);
@@ -31,6 +29,17 @@ $result = [];
 while ($row = $results->fetch_assoc()) {
   $result[] = $row;
 }
+
+$sql = "SELECT task_status,count(*) as count FROM t_todo group by task_status";
+$taskCounts = $mysqli->query($sql);
+if (!$taskCounts) {
+  die("クエリの実行に失敗しました: " . $mysqli->error);
+}
+$taskCount = [];
+while ($row = $taskCounts->fetch_assoc()) {
+  $taskCount[$row["task_status"]] = $row["count"];
+}
+
 $mysqli->close();
 
 
@@ -62,6 +71,9 @@ $mysqli->close();
     </form>
     <a href="new_regist.php" class="header__button_regist">登録</a>
   </header>
+  <p class="main"><?php echo "未着手:" . ($taskCount["未着手"] ?? 0) . "件";
+                  echo "　進行中:" . ($taskCount["進行中"] ?? 0) . "件";
+                  echo "　完了:" . ($taskCount["完了"] ?? 0) . "件"; ?></p>
   <div class="main">
     <table class="main__content">
       <tr class="main__content__columns">
@@ -74,7 +86,7 @@ $mysqli->close();
         <th></th>
       </tr>
       <?php foreach ($result as $column): ?>
-      <tr class="main__content__row">
+      <tr class=" main__content__row">
         <?php
           $statusClass =
             $column['task_status'] === '進行中' ? ' main__content__status__progress' : ($column['task_status'] === '完了' ? ' main__content__status__complete' : '');
