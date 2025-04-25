@@ -69,7 +69,7 @@ $mysqli->close();
       完了済のタスクを非表示<input type="checkbox" id="hidden_complete_flg" name="hidden_complete_flg"
         onchange="this.form.submit()" <?php echo isset($_POST["hidden_complete_flg"]) ? "checked" : ""; ?>>
     </form>
-    <a href="new_regist.php" class="header__button_regist">登録</a>
+    <a href="new_regist.php" class="header__button_regist"><i class="fa fa-plus" aria-hidden="true"></i></a>
   </header>
   <p class="main"><?php echo "未着手:" . ($taskCount["未着手"] ?? 0) . "件";
                   echo "　進行中:" . ($taskCount["進行中"] ?? 0) . "件";
