@@ -1,8 +1,8 @@
 <?php
-
+require_once('config.php');
+require_once('common_utils.php');
 function showDetail()
 {
-  require_once('config.php');
   global $deadlineDate, $content, $taskStatus, $priority, $row, $columns;
 
   $deadlineDate = "";

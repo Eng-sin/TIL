@@ -1,7 +1,8 @@
 <?php
-
 global $result, $taskCount;
 require_once('config.php');
+require_once('common_utils.php');
+
 $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 if ($mysqli->connect_error) {
   die("データベースの接続に失敗しました: " . $mysqli->connect_error);
@@ -59,6 +60,14 @@ $mysqli->close();
 </head>
 
 <body>
+  <?php if (isset($_SESSION["username"])) : ?>
+  <div class="login__area">
+    <p class="display__login__user">ようこそ、<?= htmlspecialchars($_SESSION['username'], ENT_QUOTES, "UTF-8") ?>さん</p>
+    <form action="logout.php" method="post">
+      <button name="logout_button">ログアウト</button>
+    </form>
+  </div>
+  <?php endif; ?>
   <header class="header">
     <p class="header__title">タスク一覧</p>
     <form action="output_csv.php" method="post">

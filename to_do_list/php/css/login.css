@@ -1,0 +1,14 @@
+input {
+  border: 1px solid #333333;
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.error__message {
+  color: red;
+}/*# sourceMappingURL=login.css.map */
