@@ -44,6 +44,7 @@ function showDetail()
 
 showDetail();
 
+
 ?>
 
 
@@ -100,6 +101,11 @@ showDetail();
     </div>
   </div>
   <?php endif; ?>
+  <form class="regist__new__memo" action="regist_new_memo.php" method="post">
+    <textarea class="new_memo_text" name="new_memo_text"></textarea>
+    <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
+    <button name="regist_new_memo">メモを追加</button>
+  </form>
 </body>
 
 </html>

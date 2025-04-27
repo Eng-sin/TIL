@@ -9,20 +9,22 @@ if ($mysqli->connect_error) {
 }
 
 if (isset($_POST["hidden_complete_flg"])) {
-  $sql = "SELECT * FROM t_todo where task_status in ('未着手','進行中')
+  $sql = "SELECT * FROM t_todo where task_status in ('未着手','進行中') and user_id = ?
           ORDER BY 
             FIELD(task_status,'未着手','進行中'),
             deadline_date,
             FIELD(priority,'高','中','低')";
 } else {
-  $sql = "SELECT * FROM t_todo 
+  $sql = "SELECT * FROM t_todo where user_id = ?
           ORDER BY 
             FIELD(task_status,'未着手','進行中','完了'),
             deadline_date,
             FIELD(priority,'高','中','低')";
 }
-
-$results = $mysqli->query($sql);
+$stmt = $mysqli->prepare($sql);
+$stmt->bind_param("s", $_SESSION["userid"]);
+$stmt->execute();
+$results = $stmt->get_result();
 if (!$results) {
   die("クエリの実行に失敗しました: " . $mysqli->error);
 }
@@ -31,8 +33,11 @@ while ($row = $results->fetch_assoc()) {
   $result[] = $row;
 }
 
-$sql = "SELECT task_status,count(*) as count FROM t_todo group by task_status";
-$taskCounts = $mysqli->query($sql);
+$sql = "SELECT task_status,count(*) as count FROM t_todo where user_id = ? group by task_status";
+$stmt = $mysqli->prepare($sql);
+$stmt->bind_param("s", $_SESSION["userid"]);
+$stmt->execute();
+$taskCounts = $stmt->get_result();
 if (!$taskCounts) {
   die("クエリの実行に失敗しました: " . $mysqli->error);
 }
