@@ -3,18 +3,11 @@
   margin: 0 auto;
 }
 
-.complete__regist__new__member {
-  background-color: #99FF99;
-  border: 1px solid #99FF99;
-  border-radius: 5px;
-  padding: 20px 0;
-  margin-top: 30px;
-}
-.complete__regist__new__member p {
-  padding-left: 20px;
+input {
+  border: 1px solid #333333;
 }
 
-.login__title {
+.regist__new__member__title {
   font-size: 32px;
   font-weight: bold;
   text-align: center;
@@ -23,11 +16,7 @@
   border-bottom: 1px solid #cccccc;
 }
 
-input {
-  border: 1px solid #333333;
-}
-
-.login__form {
+.regist__new__member__form {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -42,4 +31,4 @@ input {
 a {
   display: block;
   text-align: center;
-}/*# sourceMappingURL=login.css.map */
+}/*# sourceMappingURL=regist_new_member.css.map */

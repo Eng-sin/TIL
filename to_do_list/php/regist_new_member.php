@@ -1,7 +1,9 @@
 <?php
+session_start();
 require_once("config.php");
 $errorMessage = "";
-function login()
+$isComplete = "";
+function registNewMember()
 {
   if (!empty($_SESSION["username"])) {
     header("Location: index.php");
@@ -22,7 +24,7 @@ function login()
       return $errorMessage;
     }
     $username = $_POST["username"];
-    $password = $_POST["password"];
+    $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
 
     $stmt = $mysqli->prepare("select * from users where name = ? limit 1");
     $stmt->bind_param("s", $username);
@@ -30,24 +32,20 @@ function login()
     $result = $stmt->get_result();
     $result = $result->fetch_assoc();
 
-    if ($result == null) {
-      $errorMessage = "ユーザー名またはパスワードが違います。";
+    if ($result != null) {
+      $errorMessage = "そのユーザー名は既に使用されています。別のユーザー名を入力してください。";
       return $errorMessage;
+    } else {
+      $stmt = $mysqli->prepare("insert into users(name,password) values(?,?)");
+      $stmt->bind_param("ss", $username, $password);
+      $result = $stmt->execute();
+      if (!$result) {
+        die("クエリの実行に失敗しました: " . $mysqli->error);
+      }
+      $isComplete = "?isComplete=true";
+      header("Location: login.php{$isComplete}");
+      exit();
     }
-
-    $passwordDb = $result["password"];
-    if (!password_verify($password, $passwordDb)) {
-      $errorMessage = "ユーザー名またはパスワードが違います。ぱ";
-      return $errorMessage;
-    }
-
-
-    session_start();
-    $_SESSION["userid"] = $result["id"];
-    $_SESSION["username"] = $result["name"];
-    var_dump($_SESSION);
-    header("Location: index.php");
-    exit();
   } finally {
     if (isset($mysqli)) {
       $mysqli->close();
@@ -55,8 +53,8 @@ function login()
   }
 }
 
-if (array_key_exists("login_button", $_POST)) {
-  $errorMessage = login();
+if (array_key_exists("regist_new_member_button", $_POST)) {
+  $errorMessage = registNewMember();
 }
 
 
@@ -70,18 +68,13 @@ if (array_key_exists("login_button", $_POST)) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
   <link rel="stylesheet" href="css/reset.css">
-  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/regist_new_member.css">
 </head>
 
 <body>
   <div class="wrapper">
-    <?php if (!empty($_GET["isComplete"])) : ?>
-    <div class="complete__regist__new__member">
-      <p>新規会員登録が成功しました。</p>
-    </div>
-    <?php endif; ?>
-    <h1 class="login__title">ログイン画面</h1>
-    <form action="login.php" method="post" class="login__form">
+    <h1 class="regist__new__member__title">新規会員登録画面</h1>
+    <form action="regist_new_member.php" method="post" class="regist__new__member__form">
       <?php if (!empty($errorMessage)) : ?>
       <p class="error__message"><?= htmlspecialchars($errorMessage, ENT_QUOTES, "UTF-8") ?></p>
       <?php endif; ?>
@@ -90,9 +83,9 @@ if (array_key_exists("login_button", $_POST)) {
         value="<?= htmlspecialchars($_POST['username'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
       パスワード
       <input type="password" name="password">
-      <button name="login_button">ログイン</button>
+      <button name="regist_new_member_button">登録する</button>
     </form>
-    <a href="regist_new_member.php">新規会員登録はこちら</a>
+    <a href="login.php">ログイン画面に戻る</a>
   </div>
 
 </body>

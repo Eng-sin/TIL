@@ -59,4 +59,16 @@
   position: absolute;
   right: 10px;
   top: 10px;
+}
+
+.regist__new__memo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.new_memo_text {
+  max-width: 960px;
+  width: 100%;
 }/*# sourceMappingURL=detail.css.map */

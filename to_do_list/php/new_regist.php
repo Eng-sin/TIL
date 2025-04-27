@@ -17,8 +17,8 @@ function regist()
   if (mysqli_connect_error()) {
     die("データベースの接続に失敗しました");
   }
-  $stmt = $mysqli->prepare("INSERT INTO t_todo(deadline_date,content,task_status,priority) values(?,?,?,?)");
-  $stmt->bind_param("ssss", $deadlineDate, $content, $taskStatus, $priority);
+  $stmt = $mysqli->prepare("INSERT INTO t_todo(deadline_date,content,task_status,priority,user_id) values(?,?,?,?,?)");
+  $stmt->bind_param("sssss", $deadlineDate, $content, $taskStatus, $priority, $_SESSION["userid"]);
   $result = $stmt->execute();
   if (!$result) {
     die("クエリの実行に失敗しました: " . $mysqli->error);
