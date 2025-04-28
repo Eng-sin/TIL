@@ -57,6 +57,7 @@ showDetail();
   <title>To Do List</title>
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/detail.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -90,6 +91,13 @@ showDetail();
       <?php foreach ($columns as $memo): ?>
       <div class="memo__item">
         <p class="memo__item__explain"><?php echo htmlspecialchars($memo['memo'], ENT_QUOTES, 'UTF-8'); ?></p>
+        <form class="memo__item__delete" action="delete_memo.php" method="post">
+          <input type="hidden" value="<?php echo htmlspecialchars($memo['memo_id'], ENT_QUOTES, 'UTF-8') ?>"
+            name="memo_id">
+          <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
+          <button type="submit" class="button__delete__memo" name="delete_memo_button"><i class="fas fa-trash"
+              aria-hidden="true"></i></button>
+        </form>
       </div>
       <?php endforeach; ?>
     </div>
