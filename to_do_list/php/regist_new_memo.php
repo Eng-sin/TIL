@@ -17,7 +17,7 @@ function registNewMemo()
       die("クエリの実行に失敗しました: " . $mysqli->error);
     }
     $task_id = urlencode($_POST["task_id"]);
-    header("Location: show-detail.php?task_id={$task_id}");
+    header("Location: show_detail.php?task_id={$task_id}");
   } finally {
     mysqli_close($mysqli);
   }
