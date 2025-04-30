@@ -4,6 +4,7 @@ require_once('config.php');
 require_once('common_utils.php');
 
 $parsedown = new Parsedown();
+$parsedown->setSafeMode(true);
 
 function showDetail()
 {
@@ -95,8 +96,9 @@ showDetail();
   <div class="memo">
     <div class="memo__items">
       <?php foreach ($columns as $memo): ?>
-      <div class="memo__item">
-        <p class="memo__item__explain"><?php echo $parsedown->text($memo['memo']); ?></p>
+      <div class="memo__item memo__item__explain">
+        <div class="memo__item__explain"><?php echo $parsedown->text($memo['memo']); ?>
+        </div>
         <form class="memo__item__delete" action="delete_memo.php" method="post">
           <input type="hidden" value="<?php echo htmlspecialchars($memo['memo_id'], ENT_QUOTES, 'UTF-8') ?>"
             name="memo_id">
