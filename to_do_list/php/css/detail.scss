@@ -72,6 +72,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin:40px auto;
 }
 .button__delete__memo{
   border-radius: 5px;
@@ -89,5 +90,9 @@
 .new_memo_text{
   max-width: 960px;
   width: 100%;
+}
+.EasyMDEContainer {
+  width: 100%;
+  max-width: 960px;
 }
 
