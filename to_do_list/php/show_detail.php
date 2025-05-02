@@ -6,6 +6,7 @@ require_once('common_utils.php');
 
 $parsedown = new Parsedown();
 $parsedown->setSafeMode(true);
+$parsedown->setBreaksEnabled(true);
 
 function showDetail()
 {
@@ -98,7 +99,11 @@ showDetail();
     <div class="memo__items">
       <?php foreach ($columns as $memo): ?>
       <div class="memo__item memo__item__explain">
-        <div class="memo__item__explain"><?php echo $parsedown->text($memo['memo']); ?>
+        <div class="memo__item__content">
+          <p class="memo__item__create__timestamp">
+            <?php echo htmlspecialchars($memo['create_timestamp'], ENT_QUOTES, 'UTF-8') ?></p>
+          <div class="memo__item__explain"><?php echo $parsedown->text($memo['memo']); ?>
+          </div>
         </div>
         <form class="memo__item__delete" action="delete_memo.php" method="post">
           <input type="hidden" value="<?php echo htmlspecialchars($memo['memo_id'], ENT_QUOTES, 'UTF-8') ?>"
