@@ -10,7 +10,7 @@ function registNewMemo()
       die("データベースの接続に失敗しました");
     }
 
-    $stmt = $mysqli->prepare("INSERT INTO t_memo (task_id, memo) VALUES (?, ?)");
+    $stmt = $mysqli->prepare("INSERT INTO t_memo (task_id, memo,create_timestamp,update_timestamp) VALUES (?, ?,CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP())");
     $stmt->bind_param("ss", $_POST["task_id"], $_POST["new_memo_text"]);
     $result = $stmt->execute();
     if (!$result) {
