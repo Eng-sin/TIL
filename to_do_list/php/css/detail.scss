@@ -105,23 +105,19 @@
 .memo__item__explain h1 {
   font-size: 1.8rem;
   font-weight: bold;
-  margin-bottom: 0.5em;
 }
 
 .memo__item__explain h2 {
   font-size: 1.5rem;
   font-weight: bold;
-  margin-bottom: 0.4em;
 }
 
 .memo__item__explain h3 {
   font-size: 1.2rem;
   font-weight: bold;
-  margin-bottom: 0.3em;
 }
 
 .memo__item__explain p {
-  margin-bottom: 1em;
   line-height: 1.6;
   font-size: 1rem;
 }
@@ -145,3 +141,11 @@
   font-size: 0.95em;
 }
 
+
+.memo__item__create__timestamp{
+  font-size: 10px;
+}
+
+.memo__item__user__name{
+  font-size: 10px;
+}

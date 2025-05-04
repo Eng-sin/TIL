@@ -37,7 +37,11 @@ function showDetail()
   }
   $row = $result->fetch_assoc();
 
-  $stmt = $mysqli->prepare("SELECT * FROM t_memo WHERE task_id = ?");
+  $stmt = $mysqli->prepare("SELECT U.name AS name, M.create_timestamp AS create_timestamp, M.memo AS memo, M.memo_id AS memo_id
+    FROM t_memo M
+    INNER JOIN t_todo T ON M.task_id = T.task_id
+    INNER JOIN users U ON T.user_id = U.id
+    WHERE M.task_id = ?");
   $stmt->bind_param("i", $taskId);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -100,6 +104,8 @@ showDetail();
       <?php foreach ($columns as $memo): ?>
       <div class="memo__item memo__item__explain">
         <div class="memo__item__content">
+          <p class="memo__item__user__name">
+            <?= "ユーザー名：" . htmlspecialchars($memo['name'], ENT_QUOTES, "UTF-8") ?></p>
           <p class="memo__item__create__timestamp">
             <?php echo htmlspecialchars($memo['create_timestamp'], ENT_QUOTES, 'UTF-8') ?></p>
           <div class="memo__item__explain"><?php echo $parsedown->text($memo['memo']); ?>
