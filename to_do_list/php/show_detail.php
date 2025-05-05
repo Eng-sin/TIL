@@ -107,7 +107,7 @@ showDetail();
           <p class="memo__item__user__name">
             <?= "ユーザー名：" . htmlspecialchars($memo['name'], ENT_QUOTES, "UTF-8") ?></p>
           <p class="memo__item__create__timestamp">
-            <?php echo htmlspecialchars($memo['create_timestamp'], ENT_QUOTES, 'UTF-8') ?></p>
+            <?php echo date("Y年m月d日 H時i分s秒", strtotime($memo['create_timestamp'])); ?>
           <div class="memo__item__explain"><?php echo $parsedown->text($memo['memo']); ?>
           </div>
         </div>
