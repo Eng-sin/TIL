@@ -9,13 +9,13 @@ if ($mysqli->connect_error) {
 }
 
 if (isset($_POST["hidden_complete_flg"])) {
-  $sql = "SELECT * FROM t_todo where task_status in ('未着手','進行中') and user_id = ?
+  $sql = "SELECT * FROM t_todo where task_status in ('未着手','進行中') and (user_id = ? or publication_range = '公開')
           ORDER BY 
             FIELD(task_status,'未着手','進行中'),
             deadline_date,
             FIELD(priority,'高','中','低')";
 } else {
-  $sql = "SELECT * FROM t_todo where user_id = ?
+  $sql = "SELECT * FROM t_todo where (user_id = ? or publication_range = '公開')
           ORDER BY 
             FIELD(task_status,'未着手','進行中','完了'),
             deadline_date,
@@ -66,12 +66,12 @@ $mysqli->close();
 
 <body>
   <?php if (isset($_SESSION["username"])) : ?>
-  <div class="login__area">
-    <p class="display__login__user">ようこそ、<?= htmlspecialchars($_SESSION['username'], ENT_QUOTES, "UTF-8") ?>さん</p>
-    <form action="logout.php" method="post">
-      <button name="logout_button">ログアウト</button>
-    </form>
-  </div>
+    <div class="login__area">
+      <p class="display__login__user">ようこそ、<?= htmlspecialchars($_SESSION['username'], ENT_QUOTES, "UTF-8") ?>さん</p>
+      <form action="logout.php" method="post">
+        <button name="logout_button">ログアウト</button>
+      </form>
+    </div>
   <?php endif; ?>
   <header class="header">
     <p class="header__title">タスク一覧</p>
@@ -100,50 +100,55 @@ $mysqli->close();
         <th></th>
       </tr>
       <?php foreach ($result as $column): ?>
-      <tr class=" main__content__row">
-        <?php
+        <tr class=" main__content__row">
+          <?php
           $statusClass =
             $column['task_status'] === '進行中' ? ' main__content__status__progress' : ($column['task_status'] === '完了' ? ' main__content__status__complete' : '');
           ?>
-        <td>
-          <form class="main__content__row" action="show_detail.php" method="get">
-            <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
-              name="task_id">
-            <button type="submit" class="main__content__row__button_detail">詳細</button>
-          </form>
-        </td>
-        <td class="main__content__row__add__border<?php echo $statusClass ?>">
-          <?php echo htmlspecialchars($column['deadline_date'], ENT_QUOTES, 'UTF-8') ?></td>
-        <td class="main__content__row__add__border<?php echo $statusClass ?>">
-          <?php echo htmlspecialchars($column['content'], ENT_QUOTES, 'UTF-8')  ?></td>
-        <td class="main__content__row__add__border<?php echo $statusClass ?>">
-          <?php echo htmlspecialchars($column['task_status'], ENT_QUOTES, 'UTF-8')  ?></td>
-        <td class="main__content__row__add__border<?php echo $statusClass ?>">
-          <?php echo htmlspecialchars($column['priority'], ENT_QUOTES, 'UTF-8')  ?></td>
-        <td>
-          <form class="main__content__row" action="new_regist.php" method="post">
-            <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
-              name="task_id">
-            <input type="hidden" value="<?php echo htmlspecialchars($column['deadline_date'], ENT_QUOTES, 'UTF-8') ?>"
-              name="deadline_date">
-            <input type="hidden" value="<?php echo htmlspecialchars($column['content'], ENT_QUOTES, 'UTF-8') ?>"
-              name="content">
-            <input type="hidden" value="<?php echo htmlspecialchars($column['task_status'], ENT_QUOTES, 'UTF-8') ?>"
-              name="task_status">
-            <input type="hidden" value="<?php echo htmlspecialchars($column['priority'], ENT_QUOTES, 'UTF-8') ?>"
-              name="priority">
-            <button type="submit" class="main__content__row__button_edit" name="edit_button">編集</button>
-          </form>
-        </td>
-        <td>
-          <form class="main__content__row" action="delete.php" method="post">
-            <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
-              name=" task_id">
-            <button type="submit" class="main__content__row__button_delete" name="delete_button"><i class="fas fa-trash"
-                aria-hidden="true"></i></button>
-          </form>
-        </td>
-      </tr>
+          <td>
+            <form class="main__content__row" action="show_detail.php" method="get">
+              <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
+                name="task_id">
+              <button type="submit" class="main__content__row__button_detail">詳細</button>
+            </form>
+          </td>
+          <td class="main__content__row__add__border<?php echo $statusClass ?>">
+            <?php echo htmlspecialchars($column['deadline_date'], ENT_QUOTES, 'UTF-8') ?></td>
+          <td class="main__content__row__add__border<?php echo $statusClass ?>">
+            <?php echo htmlspecialchars($column['content'], ENT_QUOTES, 'UTF-8')  ?></td>
+          <td class="main__content__row__add__border<?php echo $statusClass ?>">
+            <?php echo htmlspecialchars($column['task_status'], ENT_QUOTES, 'UTF-8')  ?></td>
+          <td class="main__content__row__add__border<?php echo $statusClass ?>">
+            <?php echo htmlspecialchars($column['priority'], ENT_QUOTES, 'UTF-8')  ?></td>
+          <?php if ($column['user_id'] == $_SESSION['userid']): ?>
+            <form class="main__content__row" action="new_regist.php" method="post">
+              <td>
+                <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
+                  name="task_id">
+                <input type="hidden" value="<?php echo htmlspecialchars($column['deadline_date'], ENT_QUOTES, 'UTF-8') ?>"
+                  name="deadline_date">
+                <input type="hidden" value="<?php echo htmlspecialchars($column['content'], ENT_QUOTES, 'UTF-8') ?>"
+                  name="content">
+                <input type="hidden" value="<?php echo htmlspecialchars($column['task_status'], ENT_QUOTES, 'UTF-8') ?>"
+                  name="task_status">
+                <input type="hidden" value="<?php echo htmlspecialchars($column['priority'], ENT_QUOTES, 'UTF-8') ?>"
+                  name="priority">
+                <input type="hidden"
+                  value="<?php echo htmlspecialchars($column['publication_range'], ENT_QUOTES, 'UTF-8') ?>"
+                  name="publication_range">
+                <button type="submit" class="main__content__row__button_edit" name="edit_button">編集</button>
+            </form>
+            </td>
+            <td>
+              <form class="main__content__row" action="delete.php" method="post">
+                <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
+                  name=" task_id">
+                <button type="submit" class="main__content__row__button_delete" name="delete_button"><i class="fas fa-trash"
+                    aria-hidden="true"></i></button>
+              </form>
+            </td>
+          <?php endif; ?>
+        </tr>
       <?php endforeach; ?>
     </table>
   </div>
