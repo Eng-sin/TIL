@@ -8,6 +8,9 @@ $parsedown = new Parsedown();
 $parsedown->setSafeMode(true);
 $parsedown->setBreaksEnabled(true);
 
+$editMemoFlg = false;
+$editMemoId = "";
+
 function showDetail()
 {
   global $deadlineDate, $content, $taskStatus, $priority, $row, $columns, $createUserName;
@@ -51,7 +54,7 @@ function showDetail()
   $createUserName = $result->fetch_assoc();
 
 
-  $stmt = $mysqli->prepare("SELECT U.name AS name, M.create_timestamp AS create_timestamp, M.memo AS memo, M.memo_id AS memo_id
+  $stmt = $mysqli->prepare("SELECT U.name AS name, M.update_timestamp AS update_timestamp, M.memo AS memo, M.memo_id AS memo_id
     FROM t_memo M
     INNER JOIN t_todo T ON M.task_id = T.task_id
     INNER JOIN users U ON M.user_id = U.id
@@ -64,6 +67,18 @@ function showDetail()
   }
   $columns = $result->fetch_all(MYSQLI_ASSOC);
   mysqli_close($mysqli);
+}
+
+function editModeChange()
+{
+  global $editMemoFlg, $editMemo, $editMemoId;
+  $editMemoFlg = true;
+  $editMemo = $_POST["memo"];
+  $editMemoId = $_POST["memo_id"];
+}
+
+if (array_key_exists("change_mode_edit_memo_button", $_POST) and !empty($_POST["memo_id"])) {
+  editModeChange();
 }
 
 
@@ -125,17 +140,33 @@ showDetail();
               <p class="memo__item__user__name">
                 <?= "ユーザー名：" . htmlspecialchars($memo['name'], ENT_QUOTES, "UTF-8") ?></p>
               <p class="memo__item__create__timestamp">
-                <?php echo date("Y年m月d日 H時i分s秒", strtotime($memo['create_timestamp'])); ?>
+                <?php echo date("Y年m月d日 H時i分s秒", strtotime($memo['update_timestamp'])); ?></p>
               <div class="memo__item__explain"><?php echo $parsedown->text($memo['memo']); ?>
               </div>
             </div>
-            <form class="memo__item__delete" action="delete_memo.php" method="post">
-              <input type="hidden" value="<?php echo htmlspecialchars($memo['memo_id'], ENT_QUOTES, 'UTF-8') ?>"
-                name="memo_id">
-              <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
-              <button type="submit" class="button__delete__memo" name="delete_memo_button"><i class="fas fa-trash"
-                  aria-hidden="true"></i></button>
-            </form>
+
+            <div class="memo__items__operation">
+              <?php if (!$editMemoFlg): ?>
+                <form class="memo__item__change__mode__edit"
+                  action="show_detail.php?task_id=<?= urlencode($_GET["task_id"]) ?>" method="post">
+                  <input type="hidden" value="<?php echo htmlspecialchars($memo['memo'], ENT_QUOTES, 'UTF-8') ?>" name="memo">
+                  <input type="hidden" value="<?php echo htmlspecialchars($memo['memo_id'], ENT_QUOTES, 'UTF-8') ?>"
+                    name="memo_id">
+                  <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
+                  <button type="submit" class="change__mode__button__edit__memo"
+                    name="change_mode_edit_memo_button">編集</button>
+                </form>
+              <?php endif; ?>
+
+
+              <form class="memo__item__delete" action="delete_memo.php" method="post">
+                <input type="hidden" value="<?php echo htmlspecialchars($memo['memo_id'], ENT_QUOTES, 'UTF-8') ?>"
+                  name="memo_id">
+                <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
+                <button type="submit" class="button__delete__memo" name="delete_memo_button"><i class="fas fa-trash"
+                    aria-hidden="true"></i></button>
+              </form>
+            </div>
           </div>
         <?php endforeach; ?>
       </div>
@@ -147,16 +178,32 @@ showDetail();
       </div>
     </div>
   <?php endif; ?>
-  <form class="regist__new__memo" action="regist_new_memo.php" method="post">
-    <textarea class="new_memo_text" name="new_memo_text" id="new_memo_text"></textarea>
-    <script>
-      const easyMDE = new EasyMDE({
-        element: document.getElementById("new_memo_text"),
-      });
-    </script>
-    <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
-    <button name="regist_new_memo">メモを追加</button>
-  </form>
+
+  <?php if (!$editMemoFlg): ?>
+    <form class="regist__new__memo" action="regist_new_memo.php" method="post">
+      <textarea class="new_memo_text" name="new_memo_text" id="new_memo_text"></textarea>
+      <script>
+        const easyMDE = new EasyMDE({
+          element: document.getElementById("new_memo_text"),
+        });
+      </script>
+      <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
+      <button name="regist_new_memo">メモを追加</button>
+    </form>
+  <?php elseif ($editMemoFlg): ?>
+    <form class="edit__memo" action="edit_memo.php" method="post">
+      <textarea class="edit_memo_text" name="edit_memo_text"
+        id="edit_memo_text"><?php echo htmlspecialchars($editMemo, ENT_QUOTES, 'UTF-8') ?></textarea>
+      <script>
+        const easyMDE = new EasyMDE({
+          element: document.getElementById("edit_memo_text"),
+        });
+      </script>
+      <input type="hidden" value="<?php echo htmlspecialchars($editMemoId, ENT_QUOTES, 'UTF-8') ?>" name="edit_memo_id">
+      <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
+      <button class="edit__memo__button" name="edit_memo">メモを更新</button>
+    </form>
+  <?php endif; ?>
 </body>
 
 </html>
