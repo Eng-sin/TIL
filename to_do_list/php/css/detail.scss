@@ -48,6 +48,11 @@
   &__items{
     max-width: 960px;
     margin:0 auto;
+    &__operation{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
   &__item{
     display: flex;
@@ -148,4 +153,33 @@
 
 .memo__item__user__name{
   font-size: 10px;
+}
+
+
+.edit_memo_text{
+  max-width: 960px;
+  width: 100%;
+}
+
+.edit__memo{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin:40px auto;
+}
+
+.change__mode__button__edit__memo{
+  vertical-align: middle;
+  border: 1px solid skyblue;
+  border-radius: 5px;
+  text-decoration: none;
+  background-color: skyblue;
+  color: #ffffff;
+  padding:3px 12px;
+  margin-right: 20px;
+  &:hover{
+    opacity: 0.5;
+    transition:all 0.3s;
+  }
 }
