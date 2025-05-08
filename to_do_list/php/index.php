@@ -8,16 +8,31 @@ if ($mysqli->connect_error) {
   die("データベースの接続に失敗しました: " . $mysqli->connect_error);
 }
 
-if (isset($_POST["hidden_complete_flg"])) {
-  $sql = "SELECT * FROM t_todo where task_status in ('未着手','進行中') and (user_id = ? or publication_range = '公開')
+$completeFlag = array_key_exists("hidden_complete_flg", $_POST);
+$otherPeopleFlag = array_key_exists("hidden_other_people_task_flg", $_POST);
+
+if ($completeFlag && $otherPeopleFlag) {
+  $sql = "SELECT * FROM t_todo where task_status in ('未着手','進行中') and user_id = ?
           ORDER BY 
             FIELD(task_status,'未着手','進行中'),
             deadline_date,
             FIELD(priority,'高','中','低')";
-} else {
-  $sql = "SELECT * FROM t_todo where (user_id = ? or publication_range = '公開')
+} elseif ($completeFlag && !$otherPeopleFlag) {
+  $sql = "SELECT * FROM t_todo where task_status in ('未着手','進行中') and (user_id = ? or publication_range = '公開')
           ORDER BY 
             FIELD(task_status,'未着手','進行中','完了'),
+            deadline_date,
+            FIELD(priority,'高','中','低')";
+} elseif (!$completeFlag && $otherPeopleFlag) {
+  $sql = "SELECT * FROM t_todo where user_id = ?
+          ORDER BY 
+            FIELD(task_status,'未着手','進行中','完了'),
+            deadline_date,
+            FIELD(priority,'高','中','低')";
+} else {
+  $sql = "SELECT * FROM t_todo where user_id = ? or publication_range = '公開'
+          ORDER BY 
+            FIELD(task_status,'未着手','進行中'),
             deadline_date,
             FIELD(priority,'高','中','低')";
 }
@@ -81,7 +96,9 @@ $mysqli->close();
     </form>
     <form method="post">
       完了済のタスクを非表示<input type="checkbox" id="hidden_complete_flg" name="hidden_complete_flg"
-        onchange="this.form.submit()" <?php echo isset($_POST["hidden_complete_flg"]) ? "checked" : ""; ?>>
+        onchange="this.form.submit()" <?php echo isset($_POST["hidden_complete_flg"]) ? "checked" : ""; ?>><br>
+      他の人が作成したタスクを非表示<input type="checkbox" id="hidden_other_people_task_flg" name="hidden_other_people_task_flg"
+        onchange="this.form.submit()" <?php echo isset($_POST["hidden_other_people_task_flg"]) ? "checked" : ""; ?>>
     </form>
     <a href="new_regist.php" class="header__button_regist"><i class="fa fa-plus" aria-hidden="true"></i></a>
   </header>
