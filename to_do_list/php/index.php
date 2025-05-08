@@ -48,7 +48,19 @@ while ($row = $results->fetch_assoc()) {
   $result[] = $row;
 }
 
-$sql = "SELECT task_status,count(*) as count FROM t_todo where user_id = ? group by task_status";
+if ($completeFlag && $otherPeopleFlag) {
+  $sql = "SELECT task_status,count(*) as count FROM t_todo where task_status in ('未着手','進行中') and user_id = ?
+          group by task_status";
+} elseif ($completeFlag && !$otherPeopleFlag) {
+  $sql = "SELECT task_status,count(*) as count FROM t_todo where task_status in ('未着手','進行中') and (user_id = ? or publication_range = '公開')
+          group by task_status";
+} elseif (!$completeFlag && $otherPeopleFlag) {
+  $sql = "SELECT task_status,count(*) as count FROM t_todo where user_id = ?
+          group by task_status";
+} else {
+  $sql = "SELECT task_status,count(*) as count FROM t_todo where user_id = ? or publication_range = '公開'
+          group by task_status";
+}
 $stmt = $mysqli->prepare($sql);
 $stmt->bind_param("s", $_SESSION["userid"]);
 $stmt->execute();
