@@ -183,4 +183,9 @@
 .change__mode__button__edit__memo:hover {
   opacity: 0.5;
   transition: all 0.3s;
+}
+
+.is__edit__memo {
+  font-weight: 100;
+  color: #aaaaaa;
 }/*# sourceMappingURL=detail.css.map */

@@ -54,7 +54,7 @@ function showDetail()
   $createUserName = $result->fetch_assoc();
 
 
-  $stmt = $mysqli->prepare("SELECT U.name AS name, M.update_timestamp AS update_timestamp, M.memo AS memo, M.memo_id AS memo_id
+  $stmt = $mysqli->prepare("SELECT U.name AS name,M.create_timestamp AS create_timestamp, M.update_timestamp AS update_timestamp, M.memo AS memo, M.memo_id AS memo_id
     FROM t_memo M
     INNER JOIN t_todo T ON M.task_id = T.task_id
     INNER JOIN users U ON M.user_id = U.id
@@ -140,7 +140,11 @@ showDetail();
               <p class="memo__item__user__name">
                 <?= "ユーザー名：" . htmlspecialchars($memo['name'], ENT_QUOTES, "UTF-8") ?></p>
               <p class="memo__item__create__timestamp">
-                <?php echo date("Y年m月d日 H時i分s秒", strtotime($memo['update_timestamp'])); ?></p>
+                <?php echo date("Y年m月d日 H時i分s秒", strtotime($memo['update_timestamp'])); ?>
+                <?php if ($memo['update_timestamp'] != $memo['create_timestamp']) : ?>
+                  <span class="is__edit__memo">（編集済み）</span>
+                <?php endif; ?>
+              </p>
               <div class="memo__item__explain"><?php echo $parsedown->text($memo['memo']); ?>
               </div>
             </div>
