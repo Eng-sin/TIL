@@ -165,6 +165,8 @@ $mysqli->close();
                 <input type="hidden"
                   value="<?php echo htmlspecialchars($column['publication_range'], ENT_QUOTES, 'UTF-8') ?>"
                   name="publication_range">
+                <input type="hidden" value="<?php echo htmlspecialchars($column['manager_id'], ENT_QUOTES, 'UTF-8') ?>"
+                  name="manager_id">
                 <button type="submit" class="main__content__row__button_edit" name="edit_button">編集</button>
             </form>
             </td>
