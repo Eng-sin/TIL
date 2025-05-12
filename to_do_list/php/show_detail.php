@@ -13,7 +13,7 @@ $editMemoId = "";
 
 function showDetail()
 {
-  global $deadlineDate, $content, $taskStatus, $priority, $row, $columns, $createUserName;
+  global $deadlineDate, $content, $taskStatus, $priority, $row, $columns, $createUserName, $managerName;
 
   $deadlineDate = "";
   $content = "";
@@ -52,6 +52,16 @@ function showDetail()
     die("クエリの実行に失敗しました: " . $mysqli->error);
   }
   $createUserName = $result->fetch_assoc();
+
+  $stmt = $mysqli->prepare("SELECT U.name AS name FROM t_todo T INNER JOIN users U ON T.manager_id = U.id WHERE task_id = ?");
+  $stmt->bind_param("i", $taskId);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  if (!$result) {
+    die("クエリの実行に失敗しました: " . $mysqli->error);
+  }
+  $data = $result->fetch_assoc();
+  $managerName = $data['name'] ?? null;
 
 
   $stmt = $mysqli->prepare("SELECT U.name AS name,M.create_timestamp AS create_timestamp, M.update_timestamp AS update_timestamp, M.memo AS memo, M.memo_id AS memo_id
@@ -127,6 +137,12 @@ showDetail();
     <div class="detail__item">
       <p class="detail__item__title">作成者</p>
       <p class="detail__item__explain"><?php echo htmlspecialchars($createUserName['name'], ENT_QUOTES, 'UTF-8') ?></p>
+    </div>
+    <div class="detail__item">
+      <p class="detail__item__title">担当者</p>
+      <?php if (is_array($managerName) && $managerName['name'] != null): ?>
+        <p class="detail__item__explain"><?php echo htmlspecialchars($managerName['name'], ENT_QUOTES, 'UTF-8') ?></p>
+      <?php endif; ?>
     </div>
   </div>
 
