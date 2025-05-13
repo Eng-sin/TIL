@@ -53,4 +53,8 @@
 }
 .regist__form__item p {
   width: 150px;
+}
+
+.error__message {
+  color: red;
 }/*# sourceMappingURL=new_regist.css.map */

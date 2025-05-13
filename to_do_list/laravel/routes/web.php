@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TaskListController;
 
-Route::get('/', function () {
-    return view('index');
-});
+Route::get('/', [TaskListController::class, 'init']);

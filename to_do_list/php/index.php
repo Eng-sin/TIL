@@ -150,7 +150,7 @@ $mysqli->close();
           <td class="main__content__row__add__border<?php echo $statusClass ?>">
             <?php echo htmlspecialchars($column['priority'], ENT_QUOTES, 'UTF-8')  ?></td>
           <?php if ($column['user_id'] == $_SESSION['userid']): ?>
-            <form class="main__content__row" action="new_regist.php" method="post">
+            <form class="main__content__row" action="edit_task.php" method="post">
               <td>
                 <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
                   name="task_id">
