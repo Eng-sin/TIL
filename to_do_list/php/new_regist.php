@@ -1,6 +1,23 @@
 <?php
 require_once('config.php');
 require_once('common_utils.php');
+
+$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+if ($mysqli->connect_error) {
+  die("データベースの接続に失敗しました: " . $mysqli->connect_error);
+}
+$sql = "select * from users";
+$stmt = $mysqli->prepare($sql);
+$stmt->execute();
+$searchEngineNameListResults = $stmt->get_result();
+if (!$searchEngineNameListResults) {
+  die("クエリの実行に失敗しました: " . $mysqli->error);
+}
+$searchEngineNameList = [];
+while ($row = $searchEngineNameListResults->fetch_assoc()) {
+  $searchEngineNameList[] = $row;
+}
+
 function regist()
 {
   $deadlineDate = "";
@@ -115,7 +132,12 @@ if (array_key_exists("regist_button", $_POST)) {
 
       <div class="regist__form__item">
         <p>担当者：</p>
-        <input type="text" name="manager">
+        <input list="search-engine" type="text" name="manager">
+        <datalist id="search-engine">
+          <?php foreach ($searchEngineNameList as $row): ?>
+            <option value=<?= htmlspecialchars($row["name"], ENT_QUOTES, "UTF-8") ?>></option>
+          <?php endforeach; ?>
+        </datalist>
       </div>
       <input class="header__button_regist" type="submit" value="登録" name="regist_button">
       <a href="index.php" class="header__button_back">戻る</a>
