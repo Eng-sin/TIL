@@ -64,7 +64,7 @@ function showDetail()
   $managerName = $data['name'] ?? null;
 
 
-  $stmt = $mysqli->prepare("SELECT U.name AS name,M.create_timestamp AS create_timestamp, M.update_timestamp AS update_timestamp, M.memo AS memo, M.memo_id AS memo_id
+  $stmt = $mysqli->prepare("SELECT U.id AS user_id, U.name AS name,M.create_timestamp AS create_timestamp, M.update_timestamp AS update_timestamp, M.memo AS memo, M.memo_id AS memo_id
     FROM t_memo M
     INNER JOIN t_todo T ON M.task_id = T.task_id
     INNER JOIN users U ON M.user_id = U.id
@@ -165,28 +165,30 @@ showDetail();
               </div>
             </div>
 
-            <div class="memo__items__operation">
-              <?php if (!$editMemoFlg): ?>
-                <form class="memo__item__change__mode__edit"
-                  action="show_detail.php?task_id=<?= urlencode($_GET["task_id"]) ?>" method="post">
-                  <input type="hidden" value="<?php echo htmlspecialchars($memo['memo'], ENT_QUOTES, 'UTF-8') ?>" name="memo">
+            <?php if ($_SESSION['userid'] == $memo['user_id']): ?>
+              <div class="memo__items__operation">
+                <?php if (!$editMemoFlg): ?>
+                  <form class="memo__item__change__mode__edit"
+                    action="show_detail.php?task_id=<?= urlencode($_GET["task_id"]) ?>" method="post">
+                    <input type="hidden" value="<?php echo htmlspecialchars($memo['memo'], ENT_QUOTES, 'UTF-8') ?>" name="memo">
+                    <input type="hidden" value="<?php echo htmlspecialchars($memo['memo_id'], ENT_QUOTES, 'UTF-8') ?>"
+                      name="memo_id">
+                    <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
+                    <button type="submit" class="change__mode__button__edit__memo"
+                      name="change_mode_edit_memo_button">編集</button>
+                  </form>
+                <?php endif; ?>
+
+
+                <form class="memo__item__delete" action="delete_memo.php" method="post">
                   <input type="hidden" value="<?php echo htmlspecialchars($memo['memo_id'], ENT_QUOTES, 'UTF-8') ?>"
                     name="memo_id">
                   <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
-                  <button type="submit" class="change__mode__button__edit__memo"
-                    name="change_mode_edit_memo_button">編集</button>
+                  <button type="submit" class="button__delete__memo" name="delete_memo_button"><i class="fas fa-trash"
+                      aria-hidden="true"></i></button>
                 </form>
-              <?php endif; ?>
-
-
-              <form class="memo__item__delete" action="delete_memo.php" method="post">
-                <input type="hidden" value="<?php echo htmlspecialchars($memo['memo_id'], ENT_QUOTES, 'UTF-8') ?>"
-                  name="memo_id">
-                <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
-                <button type="submit" class="button__delete__memo" name="delete_memo_button"><i class="fas fa-trash"
-                    aria-hidden="true"></i></button>
-              </form>
-            </div>
+              </div>
+            <?php endif; ?>
           </div>
         <?php endforeach; ?>
       </div>
