@@ -67,7 +67,8 @@ require_once('config.php');
 function edit_regist()
 {
 
-  global $taskId, $deadlineDate, $content, $taskStatus, $priority, $publicationRange, $manager, $errorMessage;
+  global $taskId, $deadlineDate, $content, $taskStatus, $priority, $publicationRange, $manager, $errorMessageDeadLineDate,
+    $errorMessageContent, $errorMessageTaskStatus, $errorMessagePriority, $errorMessagePublicationRange, $errorMessageManager;
 
   $taskId = "";
   $deadlineDate = "";
@@ -85,6 +86,32 @@ function edit_regist()
   $publicationRange = $_POST["publication_range"];
 
 
+  if (!array_key_exists('deadline_date', $_POST) || empty($_POST["deadline_date"])) {
+    $errorMessageDeadLineDate = "日付を入力してください";
+    return $errorMessageDeadLineDate;
+  }
+
+  if (!array_key_exists('content', $_POST) || empty($_POST["content"])) {
+    $errorMessageContent = "内容を入力してください";
+    return $errorMessageContent;
+  }
+
+  if ($_POST['task_status'] == '') {
+    $errorMessageTaskStatus = "進捗状況を入力してください";
+    return $errorMessageTaskStatus;
+  }
+
+  if ($_POST["priority"] == '') {
+    $errorMessagePriority = "優先度を選択してください";
+    return $errorMessagePriority;
+  }
+
+  if ($_POST["publication_range"] == '') {
+    $errorMessagePublicationRange = "公開範囲を選択してください";
+    return $errorMessagePublicationRange;
+  }
+
+
   $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
   if (mysqli_connect_error()) {
     die("データベースの接続に失敗しました");
@@ -99,8 +126,8 @@ function edit_regist()
     $result = $result->fetch_assoc();
 
     if ($result == null) {
-      $errorMessage = "そのユーザー名のユーザーは存在しません";
-      return $errorMessage;
+      $errorMessageManager = "そのユーザー名のユーザーは存在しません";
+      return $errorMessageManager;
     }
   }
   $managerId = $result["id"];
@@ -142,18 +169,33 @@ if (array_key_exists("edit_regist_button", $_POST)) {
   <div class="regist">
     <form class="regist__form" method="post">
       <input type="hidden" name="task_id" value=<?php echo $taskId ?>>
+      <div>
+        <?php if (!empty($errorMessageDeadLineDate)) : ?>
+          <p class="error__message"><?= htmlspecialchars($errorMessageDeadLineDate, ENT_QUOTES, "UTF-8") ?></p>
+        <?php endif; ?>
+      </div>
       <div class="regist__form__item">
         <p>締め切り日時：</p>
         <input type="date" name="deadline_date" value=<?php echo $deadlineDate ?>>
+      </div>
+      <div>
+        <?php if (!empty($errorMessageContent)) : ?>
+          <p class="error__message"><?= htmlspecialchars($errorMessageContent, ENT_QUOTES, "UTF-8") ?></p>
+        <?php endif; ?>
       </div>
       <div class="regist__form__item">
         <p>内容：</p>
         <input type="text" name="content" value=<?php echo $content ?>>
       </div>
+      <div>
+        <?php if (!empty($errorMessageTaskStatus)) : ?>
+          <p class="error__message"><?= htmlspecialchars($errorMessageTaskStatus, ENT_QUOTES, "UTF-8") ?></p>
+        <?php endif; ?>
+      </div>
       <div class="regist__form__item">
         <p>進捗状況：</p>
         <select name="task_status" value=<?php echo $taskStatus ?>>
-          <option>選択してください</option>
+          <option value="">選択してください</option>
           <option <?php if ($_POST['task_status'] === '未着手') {
                     echo ' selected';
                   } ?> value="未着手">未着手</option>
@@ -165,10 +207,15 @@ if (array_key_exists("edit_regist_button", $_POST)) {
                   } ?> value="完了">完了</option>
         </select>
       </div>
+      <div>
+        <?php if (!empty($errorMessagePriority)) : ?>
+          <p class="error__message"><?= htmlspecialchars($errorMessagePriority, ENT_QUOTES, "UTF-8") ?></p>
+        <?php endif; ?>
+      </div>
       <div class="regist__form__item">
         <p>優先度：</p>
         <select name="priority" value=<?php echo $priority ?>>
-          <option>選択してください</option>
+          <option value="">選択してください</option>
           <option <?php if ($_POST['priority'] === '高') {
                     echo ' selected';
                   } ?> value="高">高</option>
@@ -180,10 +227,15 @@ if (array_key_exists("edit_regist_button", $_POST)) {
                   } ?> value="低">低</option>
         </select>
       </div>
+      <div>
+        <?php if (!empty($errorMessagePublicationRange)) : ?>
+          <p class="error__message"><?= htmlspecialchars($errorMessagePublicationRange, ENT_QUOTES, "UTF-8") ?></p>
+        <?php endif; ?>
+      </div>
       <div class="regist__form__item">
         <p>公開範囲：</p>
         <select name="publication_range" value=<?php echo $publicationRange ?>>
-          <option>選択してください</option>
+          <option value="">選択してください</option>
           <option <?php if ($_POST['publication_range'] === '公開') {
                     echo ' selected';
                   } ?> value="公開">公開</option>
@@ -193,8 +245,8 @@ if (array_key_exists("edit_regist_button", $_POST)) {
         </select>
       </div>
       <div>
-        <?php if (!empty($errorMessage)) : ?>
-          <p class="error__message"><?= htmlspecialchars($errorMessage, ENT_QUOTES, "UTF-8") ?></p>
+        <?php if (!empty($errorMessageManager)) : ?>
+          <p class="error__message"><?= htmlspecialchars($errorMessageManager, ENT_QUOTES, "UTF-8") ?></p>
         <?php endif; ?>
       </div>
       <div class="regist__form__item">
