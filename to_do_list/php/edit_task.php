@@ -174,6 +174,7 @@ if (array_key_exists("edit_regist_button", $_POST)) {
           <p class="error__message"><?= htmlspecialchars($errorMessageDeadLineDate, ENT_QUOTES, "UTF-8") ?></p>
         <?php endif; ?>
       </div>
+      <div id="deadlineDateError" class="error"></div>
       <div class="regist__form__item">
         <p>締め切り日時：</p>
         <input type="date" name="deadline_date" value=<?php echo $deadlineDate ?>>
@@ -183,18 +184,20 @@ if (array_key_exists("edit_regist_button", $_POST)) {
           <p class="error__message"><?= htmlspecialchars($errorMessageContent, ENT_QUOTES, "UTF-8") ?></p>
         <?php endif; ?>
       </div>
+      <div id="contentError" class="error"></div>
       <div class="regist__form__item">
         <p>内容：</p>
-        <input type="text" name="content" value=<?php echo $content ?>>
+        <input type="text" name="content" id="content" value=<?php echo $content ?>>
       </div>
       <div>
         <?php if (!empty($errorMessageTaskStatus)) : ?>
           <p class="error__message"><?= htmlspecialchars($errorMessageTaskStatus, ENT_QUOTES, "UTF-8") ?></p>
         <?php endif; ?>
       </div>
+      <div id="taskStatusError" class="error"></div>
       <div class="regist__form__item">
         <p>進捗状況：</p>
-        <select name="task_status" value=<?php echo $taskStatus ?>>
+        <select name="task_status" id="taskStatus" value=<?php echo $taskStatus ?>>
           <option value="">選択してください</option>
           <option <?php if ($_POST['task_status'] === '未着手') {
                     echo ' selected';
@@ -212,9 +215,10 @@ if (array_key_exists("edit_regist_button", $_POST)) {
           <p class="error__message"><?= htmlspecialchars($errorMessagePriority, ENT_QUOTES, "UTF-8") ?></p>
         <?php endif; ?>
       </div>
+      <div id="priorityError" class="error"></div>
       <div class="regist__form__item">
         <p>優先度：</p>
-        <select name="priority" value=<?php echo $priority ?>>
+        <select name="priority" id="priority" value=<?php echo $priority ?>>
           <option value="">選択してください</option>
           <option <?php if ($_POST['priority'] === '高') {
                     echo ' selected';
@@ -232,9 +236,10 @@ if (array_key_exists("edit_regist_button", $_POST)) {
           <p class="error__message"><?= htmlspecialchars($errorMessagePublicationRange, ENT_QUOTES, "UTF-8") ?></p>
         <?php endif; ?>
       </div>
+      <div id="publicationRangeError" class="error"></div>
       <div class="regist__form__item">
         <p>公開範囲：</p>
-        <select name="publication_range" value=<?php echo $publicationRange ?>>
+        <select name="publication_range" id="publicationRange" value=<?php echo $publicationRange ?>>
           <option value="">選択してください</option>
           <option <?php if ($_POST['publication_range'] === '公開') {
                     echo ' selected';
@@ -261,9 +266,8 @@ if (array_key_exists("edit_regist_button", $_POST)) {
       <input class="header__button_regist" type="submit" value="更新" name="edit_regist_button">
       <a href="index.php" class="header__button_back">戻る</a>
     </form>
-
   </div>
-
+  <script src="js/validate.js"></script>
 </body>
 
 </html>
