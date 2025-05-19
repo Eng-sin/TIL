@@ -36,15 +36,17 @@ document.addEventListener('DOMContentLoaded',function(){
     const input = document.getElementById(field.selector);
     const error = document.getElementById(field.errorId);
 
-
     if(!input || !error) return;
+    error.style.display = 'none';
 
     input.addEventListener('blur',function(){
 
     if(field.validate(input.value)){
       error.textContent = field.message;
+      error.style.display = 'block';
     }else{
       error.textContent = '';
+      error.style.display = 'none';
     }
     });
   });
