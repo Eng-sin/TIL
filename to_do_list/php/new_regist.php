@@ -104,16 +104,12 @@ if (array_key_exists("regist_button", $_POST)) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <!-- <link rel="stylesheet" href="css/reset.css">
-  <link rel="stylesheet" href="css/new_regist.css"> -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body>
 
   <div class="bg-gray-100 min-h-screen flex items-center justify-center">
-
-
     <div class="bg-white p-8 rounded-lg shadow-lg w-[800px]">
       <h1 class="text-2xl font-bold mb-6 text-center font-gray-800">タスク登録</h1>
       <form method="post">
@@ -203,7 +199,7 @@ if (array_key_exists("regist_button", $_POST)) {
         </div>
         <div class="flex justify-center">
           <input type="submit" value="登録" name="regist_button"
-            class=" px-4 py-2 text-white bg-sky-500 rounded-md shadow hover:bg-sky-600 mr-4">
+            class="px-4 py-2 text-white bg-sky-500 rounded-md shadow hover:bg-sky-600 mr-4">
           <a href="index.php" class="block px-4 py-2 text-white bg-gray-500 rounded-md shadow hover:bg-gray-600">戻る</a>
         </div>
       </form>
@@ -213,15 +209,3 @@ if (array_key_exists("regist_button", $_POST)) {
 </body>
 
 </html>
-
-
-
-
-<div>
-  <div class="bbb"></div>
-</div>
-<div>
-  <div>
-    <div id="aaa"></div>
-  </div>
-</div>

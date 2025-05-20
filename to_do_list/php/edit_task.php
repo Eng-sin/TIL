@@ -2,11 +2,12 @@
 require_once('config.php');
 require_once('common_utils.php');
 
+// DB接続とユーザー一覧取得
 $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 if ($mysqli->connect_error) {
   die("データベースの接続に失敗しました: " . $mysqli->connect_error);
 }
-$sql = "select * from users";
+$sql = "SELECT * FROM users";
 $stmt = $mysqli->prepare($sql);
 $stmt->execute();
 $searchEngineNameListResults = $stmt->get_result();
@@ -25,6 +26,14 @@ $taskStatus = "";
 $priority = "";
 $publicationRange = "";
 $managerId = "";
+$manager = "";
+
+$errorMessageDeadLineDate = "";
+$errorMessageContent = "";
+$errorMessageTaskStatus = "";
+$errorMessagePriority = "";
+$errorMessagePublicationRange = "";
+$errorMessageManager = "";
 
 function edit()
 {
@@ -35,239 +44,208 @@ function edit()
   $taskStatus = $_POST["task_status"];
   $priority = $_POST["priority"];
   $publicationRange = $_POST["publication_range"];
-  $managerId = null;
-  if (array_key_exists("manager_id", $_POST)) {
-    $managerId = $_POST["manager_id"];
-  }
-
+  $managerId = $_POST["manager_id"] ?? null;
 
   $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
   if (mysqli_connect_error()) {
     die("データベースの接続に失敗しました");
   }
 
-  $stmt = $mysqli->prepare("select U.name from t_todo T inner join users U on T.manager_id = U.id where T.manager_id = ? limit 1");
-  $stmt->bind_param("s", $managerId);
-  $stmt->execute();
-  $result = $stmt->get_result();
-  if (!$result) {
-    die("クエリの実行に失敗しました: " . $mysqli->error);
+  if ($managerId !== null) {
+    $stmt = $mysqli->prepare("SELECT U.name FROM t_todo T INNER JOIN users U ON T.manager_id = U.id WHERE T.manager_id = ? LIMIT 1");
+    $stmt->bind_param("s", $managerId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data = $result->fetch_assoc();
+    $manager = $data['name'] ?? '';
   }
-  $data = $result->fetch_assoc();
-  $manager = $data['name'] ?? null;
-};
-if (array_key_exists("edit_button", $_POST)) {
-  edit();
 }
-?>
-
-<?php
-require_once('config.php');
 
 function edit_regist()
 {
+  global $taskId, $deadlineDate, $content, $taskStatus, $priority, $publicationRange, $manager,
+    $errorMessageDeadLineDate, $errorMessageContent, $errorMessageTaskStatus, $errorMessagePriority,
+    $errorMessagePublicationRange, $errorMessageManager;
 
-  global $taskId, $deadlineDate, $content, $taskStatus, $priority, $publicationRange, $manager, $errorMessageDeadLineDate,
-    $errorMessageContent, $errorMessageTaskStatus, $errorMessagePriority, $errorMessagePublicationRange, $errorMessageManager;
+  $hasError = false;
 
-  $taskId = "";
-  $deadlineDate = "";
-  $content = "";
-  $taskStatus = "";
-  $priority = "";
-  $publicationRange = "";
-  $manager = null;
+  $taskId = $_POST["task_id"] ?? "";
+  $deadlineDate = $_POST["deadline_date"] ?? "";
+  $content = $_POST["content"] ?? "";
+  $taskStatus = $_POST["task_status"] ?? "";
+  $priority = $_POST["priority"] ?? "";
+  $publicationRange = $_POST["publication_range"] ?? "";
+  $manager = $_POST["manager"] ?? "";
 
-  $taskId = $_POST["task_id"];
-  $deadlineDate = $_POST["deadline_date"];
-  $content = $_POST["content"];
-  $taskStatus = $_POST["task_status"];
-  $priority = $_POST["priority"];
-  $publicationRange = $_POST["publication_range"];
-
-
-  if (!array_key_exists('deadline_date', $_POST) || empty($_POST["deadline_date"])) {
+  if (empty($deadlineDate)) {
     $errorMessageDeadLineDate = "日付を入力してください";
-    return $errorMessageDeadLineDate;
+    $hasError = true;
   }
-
-  if (!array_key_exists('content', $_POST) || empty($_POST["content"])) {
+  if (empty($content)) {
     $errorMessageContent = "内容を入力してください";
-    return $errorMessageContent;
+    $hasError = true;
   }
-
-  if ($_POST['task_status'] == '') {
+  if (empty($taskStatus)) {
     $errorMessageTaskStatus = "進捗状況を入力してください";
-    return $errorMessageTaskStatus;
+    $hasError = true;
   }
-
-  if ($_POST["priority"] == '') {
+  if (empty($priority)) {
     $errorMessagePriority = "優先度を選択してください";
-    return $errorMessagePriority;
+    $hasError = true;
   }
-
-  if ($_POST["publication_range"] == '') {
+  if (empty($publicationRange)) {
     $errorMessagePublicationRange = "公開範囲を選択してください";
-    return $errorMessagePublicationRange;
+    $hasError = true;
   }
-
 
   $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
   if (mysqli_connect_error()) {
     die("データベースの接続に失敗しました");
   }
 
-  if (array_key_exists('manager', $_POST) && !empty($_POST["manager"])) {
-    $manager = $_POST["manager"];
-    $stmt = $mysqli->prepare("select * from users where name = ? limit 1");
+  $managerId = null;
+  if (!empty($manager)) {
+    $stmt = $mysqli->prepare("SELECT * FROM users WHERE name = ? LIMIT 1");
     $stmt->bind_param("s", $manager);
     $stmt->execute();
-    $result = $stmt->get_result();
-    $result = $result->fetch_assoc();
-
-    if ($result == null) {
+    $result = $stmt->get_result()->fetch_assoc();
+    if (!$result) {
       $errorMessageManager = "そのユーザー名のユーザーは存在しません";
-      return $errorMessageManager;
+      $hasError = true;
+    } else {
+      $managerId = $result["id"];
     }
   }
-  $managerId = $result["id"];
 
-  $stmt = $mysqli->prepare("UPDATE T_TODO SET deadline_date=?,content=?,task_status=?,priority=?,publication_range=?,manager_id=?,update_timestamp=CURRENT_TIMESTAMP() where task_id=?");
+  if ($hasError) {
+    return;
+  }
+
+  $stmt = $mysqli->prepare("UPDATE T_TODO SET deadline_date=?, content=?, task_status=?, priority=?, publication_range=?, manager_id=?, update_timestamp=CURRENT_TIMESTAMP() WHERE task_id=?");
   $stmt->bind_param("sssssii", $deadlineDate, $content, $taskStatus, $priority, $publicationRange, $managerId, $taskId);
-  $result = $stmt->execute();
-  if (!$result) {
+  if (!$stmt->execute()) {
     die("クエリの実行に失敗しました: " . $mysqli->error);
   }
 
   mysqli_close($mysqli);
   header('Location: http://localhost:3000/index.php');
   exit();
-};
-if (array_key_exists("edit_regist_button", $_POST)) {
+}
+
+if (isset($_POST["edit_button"])) {
+  edit();
+}
+if (isset($_POST["edit_regist_button"])) {
   edit_regist();
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <link rel="stylesheet" href="css/reset.css">
-  <link rel="stylesheet" href="css/new_regist.css">
+  <title>タスク更新</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
-  <!--更新-->
-  <header class="header">
-    <p class="header__title">タスク更新</p>
-  </header>
+  <div class="bg-white p-8 rounded-lg shadow-lg w-[800px]">
+    <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">タスク更新</h1>
+    <form method="post">
+      <input type="hidden" name="task_id" value="<?= htmlspecialchars($taskId, ENT_QUOTES, 'UTF-8') ?>">
 
-  <div class="regist">
-    <form class="regist__form" method="post">
-      <input type="hidden" name="task_id" value=<?php echo $taskId ?>>
-      <div>
-        <?php if (!empty($errorMessageDeadLineDate)) : ?>
-          <p class="error__message"><?= htmlspecialchars($errorMessageDeadLineDate, ENT_QUOTES, "UTF-8") ?></p>
-        <?php endif; ?>
+      <!-- 締め切り日時 -->
+      <?php if ($errorMessageDeadLineDate): ?>
+        <div class="bg-red-100 text-red-700 p-2 mb-2 rounded"><?= htmlspecialchars($errorMessageDeadLineDate) ?></div>
+      <?php endif; ?>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700"><span class="text-red-700">※</span>締め切り日付</label>
+        <input type="date" name="deadline_date"
+          class="mt-1 w-full px-4 py-2 border border-gray-500 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+          value="<?= htmlspecialchars($deadlineDate, ENT_QUOTES, 'UTF-8') ?>">
       </div>
-      <div id="deadlineDateError" class="error"></div>
-      <div class="regist__form__item">
-        <p>締め切り日時：</p>
-        <input type="date" name="deadline_date" value=<?php echo $deadlineDate ?>>
+
+      <!-- 内容 -->
+      <?php if ($errorMessageContent): ?>
+        <div class="bg-red-100 text-red-700 p-2 mb-2 rounded"><?= htmlspecialchars($errorMessageContent) ?></div>
+      <?php endif; ?>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700"><span class="text-red-700">※</span>内容</label>
+        <input type="text" name="content"
+          class="mt-1 w-full px-4 py-2 border border-gray-500 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+          value="<?= htmlspecialchars($content, ENT_QUOTES, 'UTF-8') ?>">
       </div>
-      <div>
-        <?php if (!empty($errorMessageContent)) : ?>
-          <p class="error__message"><?= htmlspecialchars($errorMessageContent, ENT_QUOTES, "UTF-8") ?></p>
-        <?php endif; ?>
-      </div>
-      <div id="contentError" class="error"></div>
-      <div class="regist__form__item">
-        <p>内容：</p>
-        <input type="text" name="content" id="content" value=<?php echo $content ?>>
-      </div>
-      <div>
-        <?php if (!empty($errorMessageTaskStatus)) : ?>
-          <p class="error__message"><?= htmlspecialchars($errorMessageTaskStatus, ENT_QUOTES, "UTF-8") ?></p>
-        <?php endif; ?>
-      </div>
-      <div id="taskStatusError" class="error"></div>
-      <div class="regist__form__item">
-        <p>進捗状況：</p>
-        <select name="task_status" id="taskStatus" value=<?php echo $taskStatus ?>>
+
+      <!-- 進捗状況 -->
+      <?php if ($errorMessageTaskStatus): ?>
+        <div class="bg-red-100 text-red-700 p-2 mb-2 rounded"><?= htmlspecialchars($errorMessageTaskStatus) ?></div>
+      <?php endif; ?>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700"><span class="text-red-700">※</span>進捗状況</label>
+        <select name="task_status"
+          class="mt-1 w-full px-4 py-2 border border-gray-500 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
           <option value="">選択してください</option>
-          <option <?php if ($_POST['task_status'] === '未着手') {
-                    echo ' selected';
-                  } ?> value="未着手">未着手</option>
-          <option <?php if ($_POST['task_status'] === '進行中') {
-                    echo ' selected';
-                  } ?> value="進行中">進行中</option>
-          <option <?php if ($_POST['task_status'] === '完了') {
-                    echo ' selected';
-                  } ?> value="完了">完了</option>
+          <option value="未着手" <?= $taskStatus === '未着手' ? 'selected' : '' ?>>未着手</option>
+          <option value="進行中" <?= $taskStatus === '進行中' ? 'selected' : '' ?>>進行中</option>
+          <option value="完了" <?= $taskStatus === '完了' ? 'selected' : '' ?>>完了</option>
         </select>
       </div>
-      <div>
-        <?php if (!empty($errorMessagePriority)) : ?>
-          <p class="error__message"><?= htmlspecialchars($errorMessagePriority, ENT_QUOTES, "UTF-8") ?></p>
-        <?php endif; ?>
-      </div>
-      <div id="priorityError" class="error"></div>
-      <div class="regist__form__item">
-        <p>優先度：</p>
-        <select name="priority" id="priority" value=<?php echo $priority ?>>
+
+      <!-- 優先度 -->
+      <?php if ($errorMessagePriority): ?>
+        <div class="bg-red-100 text-red-700 p-2 mb-2 rounded"><?= htmlspecialchars($errorMessagePriority) ?></div>
+      <?php endif; ?>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700"><span class="text-red-700">※</span>優先度</label>
+        <select name="priority"
+          class="mt-1 w-full px-4 py-2 border border-gray-500 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
           <option value="">選択してください</option>
-          <option <?php if ($_POST['priority'] === '高') {
-                    echo ' selected';
-                  } ?> value="高">高</option>
-          <option <?php if ($_POST['priority'] === '中') {
-                    echo ' selected';
-                  } ?> value="中">中</option>
-          <option <?php if ($_POST['priority'] === '低') {
-                    echo ' selected';
-                  } ?> value="低">低</option>
+          <option value="高" <?= $priority === '高' ? 'selected' : '' ?>>高</option>
+          <option value="中" <?= $priority === '中' ? 'selected' : '' ?>>中</option>
+          <option value="低" <?= $priority === '低' ? 'selected' : '' ?>>低</option>
         </select>
       </div>
-      <div>
-        <?php if (!empty($errorMessagePublicationRange)) : ?>
-          <p class="error__message"><?= htmlspecialchars($errorMessagePublicationRange, ENT_QUOTES, "UTF-8") ?></p>
-        <?php endif; ?>
-      </div>
-      <div id="publicationRangeError" class="error"></div>
-      <div class="regist__form__item">
-        <p>公開範囲：</p>
-        <select name="publication_range" id="publicationRange" value=<?php echo $publicationRange ?>>
+
+      <!-- 公開範囲 -->
+      <?php if ($errorMessagePublicationRange): ?>
+        <div class="bg-red-100 text-red-700 p-2 mb-2 rounded"><?= htmlspecialchars($errorMessagePublicationRange) ?></div>
+      <?php endif; ?>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700"><span class="text-red-700">※</span>公開範囲</label>
+        <select name="publication_range"
+          class="mt-1 w-full px-4 py-2 border border-gray-500 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
           <option value="">選択してください</option>
-          <option <?php if ($_POST['publication_range'] === '公開') {
-                    echo ' selected';
-                  } ?> value="公開">公開</option>
-          <option <?php if ($_POST['publication_range'] === '非公開') {
-                    echo ' selected';
-                  } ?> value="非公開">非公開(自分のみ)</option>
+          <option value="公開" <?= $publicationRange === '公開' ? 'selected' : '' ?>>公開</option>
+          <option value="非公開" <?= $publicationRange === '非公開' ? 'selected' : '' ?>>非公開（自分のみ）</option>
         </select>
       </div>
-      <div>
-        <?php if (!empty($errorMessageManager)) : ?>
-          <p class="error__message"><?= htmlspecialchars($errorMessageManager, ENT_QUOTES, "UTF-8") ?></p>
-        <?php endif; ?>
-      </div>
-      <div class="regist__form__item">
-        <p>担当者：</p>
-        <input list="search-engine" type="text" name="manager" value=<?php echo $manager ?>>
+
+      <!-- 担当者 -->
+      <?php if ($errorMessageManager): ?>
+        <div class="bg-red-100 text-red-700 p-2 mb-2 rounded"><?= htmlspecialchars($errorMessageManager) ?></div>
+      <?php endif; ?>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700"><span class="text-red-700">※</span>担当者</label>
+        <input type="text" name="manager" list="search-engine"
+          class="mt-1 w-full px-4 py-2 border border-gray-500 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+          value="<?= htmlspecialchars($manager, ENT_QUOTES, 'UTF-8') ?>">
         <datalist id="search-engine">
           <?php foreach ($searchEngineNameList as $row): ?>
-            <option value=<?= htmlspecialchars($row["name"], ENT_QUOTES, "UTF-8") ?>></option>
+            <option value="<?= htmlspecialchars($row["name"], ENT_QUOTES, 'UTF-8') ?>"></option>
           <?php endforeach; ?>
         </datalist>
       </div>
-      <input class="header__button_regist" type="submit" value="更新" name="edit_regist_button">
-      <a href="index.php" class="header__button_back">戻る</a>
+
+      <div class="flex justify-center mt-6">
+        <input type="submit" name="edit_regist_button"
+          class="px-4 py-2 text-white bg-sky-500 rounded-md shadow hover:bg-sky-600 mr-4" value=" 更新">
+        <a href="index.php" class="block px-4 py-2 text-white bg-gray-500 rounded-md shadow hover:bg-gray-600">戻る</a>
+      </div>
     </form>
   </div>
-  <script src="js/validate.js"></script>
+
 </body>
 
 </html>
