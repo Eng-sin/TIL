@@ -106,8 +106,6 @@ $mysqli->close();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>To Do List</title>
-  <!-- <link rel="stylesheet" href="css/reset.css">
-  <link rel="stylesheet" href="css/index.css"> -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -120,21 +118,33 @@ $mysqli->close();
       <div
         class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-100 border border-gray-300 rounded-lg shadow-lg w-[calc(100vw-8rem)] h-[calc(100vh-8rem)] flex">
         <div class="bg-sky-500 rounded-lg shadow-lg h-full p-2  w-1/6">
-          <?php if (isset($_SESSION["username"])) : ?>
-            <p class="text-sm font-medium text-white">ユーザーID</p>
-            <p class="text-white bg-sky-500 rounded-sm shadow-sm">
-              <?= htmlspecialchars($_SESSION['username'], ENT_QUOTES, "UTF-8") ?></p>
-            <form action="logout.php" method="post">
-              <button name="logout_button">ログアウト</button>
+          <div class="border-b border-sky-400 pb-2">
+            <?php if (isset($_SESSION["username"])) : ?>
+              <p class="text-sm font-medium text-white">ユーザーID</p>
+              <p class="text-white bg-sky-500 font-bold">
+                <?= htmlspecialchars($_SESSION['username'], ENT_QUOTES, "UTF-8") ?></p>
+            <?php endif; ?>
+          </div>
+          <div class="border-b border-sky-400 py-2">
+            <a href="new_regist.php" class="text-sm font-medium text-white transition hover:opacity-30">タスクの追加</a>
+          </div>
+          <div class="border-b border-sky-400 py-2">
+            <form action=" output_csv.php" method="post">
+              <button type="submit" class="text-sm font-medium text-white transition hover:opacity-30"
+                name="output_csv">csvエクスポート
+              </button>
             </form>
-          <?php endif; ?>
+          </div>
+          <div class="border-b border-sky-400 py-2">
+            <form action="logout.php" method="post">
+              <button class="text-sm font-medium text-white transition hover:opacity-30"
+                name="logout_button">ログアウト</button>
+            </form>
+          </div>
         </div>
-        <div>
-          <p class="text-2xl font-bold mb-6 text-center text-gray-800">タスク一覧</p>
-          <form action=" output_csv.php" method="post">
-            <button type="submit" class="header__button_output__csv" name="output_csv">csvエクスポート
-            </button>
-          </form>
+        <div class="p-8 flex flex-col h-full w-full">
+          <p class="text-2xl font-bold mb-6 text-gray-800">タスク一覧</p>
+
           <form method="post">
             完了済のタスクを非表示<input type="checkbox" id="hidden_complete_flg" name="hidden_complete_flg"
               onchange="this.form.submit()" <?php echo isset($_POST["hidden_complete_flg"]) ? "checked" : ""; ?>><br>
@@ -142,86 +152,85 @@ $mysqli->close();
               onchange="this.form.submit()"
               <?php echo isset($_POST["hidden_other_people_task_flg"]) ? "checked" : ""; ?>>
           </form>
-          <a href="new_regist.php" class="header__button_regist"><i class="fa fa-plus" aria-hidden="true"></i></a>
           <p class="main"><?php echo "未着手:" . ($taskCount["未着手"] ?? 0) . "件";
                           echo "　進行中:" . ($taskCount["進行中"] ?? 0) . "件";
                           echo "　完了:" . ($taskCount["完了"] ?? 0) . "件";
                           echo "　自分担当のタスク:" . ($managerTaskCount ?? 0) . "件"; ?></p>
-          <div class="main">
-            <table class="main__content">
-              <tr class="main__content__columns">
-                <th></th>
-                <th class="main__content__columns__add__border">締め切り日付</th>
-                <th class="main__content__columns__add__border">内容</th>
-                <th class="main__content__columns__add__border">進捗状況</th>
-                <th class="main__content__columns__add__border">優先度</th>
-                <th class="main__content__columns__add__border">担当者</th>
-                <th></th>
-                <th></th>
-              </tr>
-              <?php foreach ($result as $column): ?>
-                <tr class=" main__content__row">
+          <div class="overflow-auto h-full rounded-lg">
+            <?php foreach ($result as $column): ?>
+              <div class="bg-white border-b border-gray-100 px-2 py-4 grid grid-cols-6 gap-4 items-center">
+                <div class="flex flex-col">
                   <?php
                   $statusClass =
                     $column['task_status'] === '進行中' ? ' main__content__status__progress' : ($column['task_status'] === '完了' ? ' main__content__status__complete' : '');
                   ?>
-                  <td>
-                    <form class="main__content__row" action="show_detail.php" method="get">
+                  <form action="show_detail.php" method="get">
+                    <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
+                      name="task_id">
+                    <button type="submit" class="text-left">
+                      <p class="text-gray-700 hover:opacity-30<?php echo $statusClass ?>">
+                        <?php echo htmlspecialchars($column['content'], ENT_QUOTES, 'UTF-8')  ?></p>
+                    </button>
+                  </form>
+                  <p class="text-gray-700 text-sm<?php echo $statusClass ?>">
+                    締切日<?php echo htmlspecialchars($column['deadline_date'], ENT_QUOTES, 'UTF-8') ?></p>
+                </div>
+                <div class="flex flex-col">
+                  <p class="text-gray-700 text-sm">ステータス</p>
+                  <p class="text-gray-700<?php echo $statusClass ?>">
+                    <?php echo htmlspecialchars($column['task_status'], ENT_QUOTES, 'UTF-8')  ?></p>
+                </div>
+                <div class="flex flex-col">
+                  <p class="text-gray-700 text-sm">優先度</p>
+                  <p class="text-gray-700<?php echo $statusClass ?>">
+                    <?php echo htmlspecialchars($column['priority'], ENT_QUOTES, 'UTF-8')  ?></p>
+                </div>
+                <div class="flex flex-col">
+                  <p class="text-gray-700 text-sm">担当者</p>
+                  <p class="text-gray-700<?php echo $statusClass ?>">
+                    <?php echo htmlspecialchars($column['name'] ?? '-', ENT_QUOTES, 'UTF-8')  ?></p>
+                </div>
+
+                <?php if ($column['user_id'] == $_SESSION['userid']): ?>
+                  <form action="edit_task.php" method="post">
+                    <div>
                       <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
                         name="task_id">
-                      <button type="submit" class="main__content__row__button_detail">詳細</button>
-                    </form>
-                  </td>
-                  <td class="main__content__row__add__border<?php echo $statusClass ?>">
-                    <?php echo htmlspecialchars($column['deadline_date'], ENT_QUOTES, 'UTF-8') ?></td>
-                  <td class="main__content__row__add__border<?php echo $statusClass ?>">
-                    <?php echo htmlspecialchars($column['content'], ENT_QUOTES, 'UTF-8')  ?></td>
-                  <td class="main__content__row__add__border<?php echo $statusClass ?>">
-                    <?php echo htmlspecialchars($column['task_status'], ENT_QUOTES, 'UTF-8')  ?></td>
-                  <td class="main__content__row__add__border<?php echo $statusClass ?>">
-                    <?php echo htmlspecialchars($column['priority'], ENT_QUOTES, 'UTF-8')  ?></td>
-                  <td class="main__content__row__add__border<?php echo $statusClass ?>">
-                    <?php echo htmlspecialchars($column['name'] ?? '-', ENT_QUOTES, 'UTF-8')  ?></td>
-                  <?php if ($column['user_id'] == $_SESSION['userid']): ?>
-                    <form class="main__content__row" action="edit_task.php" method="post">
-                      <td>
-                        <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
-                          name="task_id">
-                        <input type="hidden"
-                          value="<?php echo htmlspecialchars($column['deadline_date'], ENT_QUOTES, 'UTF-8') ?>"
-                          name="deadline_date">
-                        <input type="hidden" value="<?php echo htmlspecialchars($column['content'], ENT_QUOTES, 'UTF-8') ?>"
-                          name="content">
-                        <input type="hidden"
-                          value="<?php echo htmlspecialchars($column['task_status'], ENT_QUOTES, 'UTF-8') ?>"
-                          name="task_status">
-                        <input type="hidden"
-                          value="<?php echo htmlspecialchars($column['priority'], ENT_QUOTES, 'UTF-8') ?>" name="priority">
-                        <input type="hidden"
-                          value="<?php echo htmlspecialchars($column['publication_range'], ENT_QUOTES, 'UTF-8') ?>"
-                          name="publication_range">
-                        <input type="hidden"
-                          value="<?php echo htmlspecialchars($column['manager_id'], ENT_QUOTES, 'UTF-8') ?>"
-                          name="manager_id">
-                        <button type="submit" class="main__content__row__button_edit" name="edit_button">編集</button>
-                    </form>
-                    </td>
-                    <td>
-                      <form class="main__content__row" action="delete.php" method="post">
-                        <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
-                          name=" task_id">
-                        <button type="submit" class="main__content__row__button_delete" name="delete_button"><i
-                            class="fas fa-trash" aria-hidden="true"></i></button>
-                      </form>
-                    </td>
-                  <?php endif; ?>
-                </tr>
-              <?php endforeach; ?>
-            </table>
+                      <input type="hidden"
+                        value="<?php echo htmlspecialchars($column['deadline_date'], ENT_QUOTES, 'UTF-8') ?>"
+                        name="deadline_date">
+                      <input type="hidden" value="<?php echo htmlspecialchars($column['content'], ENT_QUOTES, 'UTF-8') ?>"
+                        name="content">
+                      <input type="hidden"
+                        value="<?php echo htmlspecialchars($column['task_status'], ENT_QUOTES, 'UTF-8') ?>"
+                        name="task_status">
+                      <input type="hidden" value="<?php echo htmlspecialchars($column['priority'], ENT_QUOTES, 'UTF-8') ?>"
+                        name="priority">
+                      <input type="hidden"
+                        value="<?php echo htmlspecialchars($column['publication_range'], ENT_QUOTES, 'UTF-8') ?>"
+                        name="publication_range">
+                      <input type="hidden"
+                        value="<?php echo htmlspecialchars($column['manager_id'], ENT_QUOTES, 'UTF-8') ?>"
+                        name="manager_id">
+                      <button type="submit" class="text-white font-bold bg-sky-500 px-4 py-2 rounded-lg shadow-lg mr-8"
+                        name="edit_button">編集</button>
+                  </form>
+              </div>
+              <div>
+                <form class="main__content__row" action="delete.php" method="post">
+                  <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
+                    name=" task_id">
+                  <button type="submit" class="bg-red-500 px-4 py-2 rounded-lg shadow-lg" name="delete_button"><i
+                      class="fas fa-trash" aria-hidden="true"></i></button>
+                </form>
+              </div>
+            <?php endif; ?>
           </div>
+        <?php endforeach; ?>
         </div>
       </div>
     </div>
+  </div>
   </div>
 </body>
 
