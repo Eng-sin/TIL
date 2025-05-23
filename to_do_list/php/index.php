@@ -126,6 +126,9 @@ $mysqli->close();
             <?php endif; ?>
           </div>
           <div class="border-b border-sky-400 py-2">
+            <a href="index.php" class="text-sm font-medium text-white transition hover:opacity-30">タスク一覧</a>
+          </div>
+          <div class="border-b border-sky-400 py-2">
             <a href="new_regist.php" class="text-sm font-medium text-white transition hover:opacity-30">タスクの追加</a>
           </div>
           <div class="border-b border-sky-400 py-2">
@@ -168,7 +171,7 @@ $mysqli->close();
                     <input type="hidden" value="<?php echo htmlspecialchars($column['task_id'], ENT_QUOTES, 'UTF-8') ?>"
                       name="task_id">
                     <button type="submit" class="text-left">
-                      <p class="text-gray-700 hover:opacity-30<?php echo $statusClass ?>">
+                      <p class="text-gray-700 transition hover:opacity-30<?php echo $statusClass ?>">
                         <?php echo htmlspecialchars($column['content'], ENT_QUOTES, 'UTF-8')  ?></p>
                     </button>
                   </form>

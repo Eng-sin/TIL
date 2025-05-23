@@ -110,122 +110,173 @@ showDetail();
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
   <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body>
-  <header class="header">
-    <p class="header__title">タスク詳細</p>
-    <a class="back__home" href="index.php">戻る</a>
-  </header>
-  <div class="detail__items">
-    <div class="detail__item">
-      <p class="detail__item__title">締め切り日付</p>
-      <p class="detail__item__explain"><?php echo htmlspecialchars($row['deadline_date'], ENT_QUOTES, 'UTF-8') ?></p>
-    </div>
-    <div class="detail__item">
-      <p class="detail__item__title">内容</p>
-      <p class="detail__item__explain"><?php echo htmlspecialchars($row['content'], ENT_QUOTES, 'UTF-8') ?></p>
-    </div>
-    <div class="detail__item">
-      <p class="detail__item__title">進捗状況</p>
-      <p class="detail__item__explain"><?php echo htmlspecialchars($row['task_status'], ENT_QUOTES, 'UTF-8') ?></p>
-    </div>
-    <div class="detail__item">
-      <p class="detail__item__title">優先度</p>
-      <p class="detail__item__explain"><?php echo htmlspecialchars($row['priority'], ENT_QUOTES, 'UTF-8') ?></p>
-    </div>
-    <div class="detail__item">
-      <p class="detail__item__title">作成者</p>
-      <p class="detail__item__explain"><?php echo htmlspecialchars($createUserName['name'], ENT_QUOTES, 'UTF-8') ?></p>
-    </div>
-    <div class="detail__item">
-      <p class="detail__item__title">担当者</p>
-      <?php if (is_array($managerName) && $managerName['name'] != null): ?>
-        <p class="detail__item__explain"><?php echo htmlspecialchars($managerName['name'], ENT_QUOTES, 'UTF-8') ?></p>
-      <?php endif; ?>
-    </div>
-  </div>
-
-  <p class="memo__title">メモ一覧</p>
-  <?php if (!empty($columns)): ?>
-    <div class="memo">
-      <div class="memo__items">
-        <?php foreach ($columns as $memo): ?>
-          <div class="memo__item memo__item__explain">
-            <div class="memo__item__content">
-              <p class="memo__item__user__name">
-                <?= "ユーザー名：" . htmlspecialchars($memo['name'], ENT_QUOTES, "UTF-8") ?></p>
-              <p class="memo__item__create__timestamp">
-                <?php echo date("Y年m月d日 H時i分s秒", strtotime($memo['update_timestamp'])); ?>
-                <?php if ($memo['update_timestamp'] != $memo['create_timestamp']) : ?>
-                  <span class="is__edit__memo">（編集済み）</span>
-                <?php endif; ?>
-              </p>
-              <div class="memo__item__explain"><?php echo $parsedown->text($memo['memo']); ?>
-              </div>
-            </div>
-
-            <?php if ($_SESSION['userid'] == $memo['user_id']): ?>
-              <div class="memo__items__operation">
-                <?php if (!$editMemoFlg): ?>
-                  <form class="memo__item__change__mode__edit"
-                    action="show_detail.php?task_id=<?= urlencode($_GET["task_id"]) ?>" method="post">
-                    <input type="hidden" value="<?php echo htmlspecialchars($memo['memo'], ENT_QUOTES, 'UTF-8') ?>" name="memo">
-                    <input type="hidden" value="<?php echo htmlspecialchars($memo['memo_id'], ENT_QUOTES, 'UTF-8') ?>"
-                      name="memo_id">
-                    <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
-                    <button type="submit" class="change__mode__button__edit__memo"
-                      name="change_mode_edit_memo_button">編集</button>
-                  </form>
-                <?php endif; ?>
 
 
-                <form class="memo__item__delete" action="delete_memo.php" method="post">
-                  <input type="hidden" value="<?php echo htmlspecialchars($memo['memo_id'], ENT_QUOTES, 'UTF-8') ?>"
-                    name="memo_id">
-                  <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
-                  <button type="submit" class="button__delete__memo" name="delete_memo_button"><i class="fas fa-trash"
-                      aria-hidden="true"></i></button>
-                </form>
-              </div>
+
+
+
+
+
+  <div class="bg-blue-500 min-h-screen flex justify-center items-center">
+    <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+              bg-white rounded-lg shadow-lg w-[calc(100vw-4rem)] h-[calc(100vh-4rem)] p-8">
+      <div
+        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-100 border border-gray-300 rounded-lg shadow-lg w-[calc(100vw-8rem)] h-[calc(100vh-8rem)] flex">
+        <div class="bg-sky-500 rounded-lg shadow-lg h-full p-2  w-1/6">
+          <div class="border-b border-sky-400 pb-2">
+            <?php if (isset($_SESSION["username"])) : ?>
+              <p class="text-sm font-medium text-white">ユーザーID</p>
+              <p class="text-white bg-sky-500 font-bold">
+                <?= htmlspecialchars($_SESSION['username'], ENT_QUOTES, "UTF-8") ?></p>
             <?php endif; ?>
           </div>
-        <?php endforeach; ?>
-      </div>
-    </div>
-  <?php else: ?>
-    <div class="memo__items">
-      <div class="memo__item">
-        <p class="memo__item__explain">メモはありません。</p>
-      </div>
-    </div>
-  <?php endif; ?>
+          <div class="border-b border-sky-400 py-2">
+            <a href="index.php" class="text-sm font-medium text-white transition hover:opacity-30">タスク一覧</a>
+          </div>
+          <div class="border-b border-sky-400 py-2">
+            <a href="new_regist.php" class="text-sm font-medium text-white transition hover:opacity-30">タスクの追加</a>
+          </div>
+          <div class="border-b border-sky-400 py-2">
+            <form action=" output_csv.php" method="post">
+              <button type="submit" class="text-sm font-medium text-white transition hover:opacity-30"
+                name="output_csv">csvエクスポート
+              </button>
+            </form>
+          </div>
+          <div class="border-b border-sky-400 py-2">
+            <form action="logout.php" method="post">
+              <button class="text-sm font-medium text-white transition hover:opacity-30"
+                name="logout_button">ログアウト</button>
+            </form>
+          </div>
+        </div>
+        <div class="p-8 flex flex-col h-full w-full overflow-auto">
+          <p class="text-2xl font-bold mb-6 text-gray-800">タスク詳細</p>
+          <div class="bg-white border-b border-gray-100 px-2 py-4 grid grid-cols-1 gap-4 items-center">
+            <p>締め切り日付</p>
+            <p><?php echo htmlspecialchars($row['deadline_date'], ENT_QUOTES, 'UTF-8') ?>
+            </p>
+          </div>
+          <div class="bg-white border-b border-gray-100 px-2 py-4 grid grid-cols-1 gap-4 items-center">
+            <p>内容</p>
+            <p><?php echo htmlspecialchars($row['content'], ENT_QUOTES, 'UTF-8') ?>
+            </p>
+          </div>
+          <div class="bg-white border-b border-gray-100 px-2 py-4 grid grid-cols-1 gap-4 items-center">
+            <p>進捗状況</p>
+            <p><?php echo htmlspecialchars($row['task_status'], ENT_QUOTES, 'UTF-8') ?>
+            </p>
+          </div>
+          <div class="bg-white border-b border-gray-100 px-2 py-4 grid grid-cols-1 gap-4 items-center">
+            <p>優先度</p>
+            <p><?php echo htmlspecialchars($row['priority'], ENT_QUOTES, 'UTF-8') ?>
+            </p>
+          </div>
+          <div class="bg-white border-b border-gray-100 px-2 py-4 grid grid-cols-1 gap-4 items-center">
+            <p>作成者</p>
+            <p><?php echo htmlspecialchars($createUserName['name'], ENT_QUOTES, 'UTF-8') ?>
+            </p>
+          </div>
+          <div class="bg-white border-b border-gray-100 px-2 py-4 grid grid-cols-1 gap-4 items-center">
+            <p>担当者</p>
+            <?php if (is_array($managerName) && $managerName['name'] != null): ?>
+              <p><?php echo htmlspecialchars($managerName['name'], ENT_QUOTES, 'UTF-8') ?>
+              <?php endif; ?>
+              </p>
+          </div>
 
-  <?php if (!$editMemoFlg): ?>
-    <form class="regist__new__memo" action="regist_new_memo.php" method="post">
-      <textarea class="new_memo_text" name="new_memo_text" id="new_memo_text"></textarea>
-      <script>
-        const easyMDE = new EasyMDE({
-          element: document.getElementById("new_memo_text"),
-        });
-      </script>
-      <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
-      <button name="regist_new_memo">メモを追加</button>
-    </form>
-  <?php elseif ($editMemoFlg): ?>
-    <form class="edit__memo" action="edit_memo.php" method="post">
-      <textarea class="edit_memo_text" name="edit_memo_text"
-        id="edit_memo_text"><?php echo htmlspecialchars($editMemo, ENT_QUOTES, 'UTF-8') ?></textarea>
-      <script>
-        const easyMDE = new EasyMDE({
-          element: document.getElementById("edit_memo_text"),
-        });
-      </script>
-      <input type="hidden" value="<?php echo htmlspecialchars($editMemoId, ENT_QUOTES, 'UTF-8') ?>" name="edit_memo_id">
-      <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
-      <button class="edit__memo__button" name="edit_memo">メモを更新</button>
-    </form>
-  <?php endif; ?>
+          <p class="text-2xl font-bold mb-6 text-gray-800 pt-8">メモ一覧</p>
+          <?php if (!empty($columns)): ?>
+            <div>
+              <div>
+                <?php foreach ($columns as $memo): ?>
+                  <div class="memo__item memo__item__explain">
+                    <div class="memo__item__content">
+                      <p class="memo__item__user__name">
+                        <?= "ユーザー名：" . htmlspecialchars($memo['name'], ENT_QUOTES, "UTF-8") ?></p>
+                      <p class="memo__item__create__timestamp">
+                        <?php echo date("Y年m月d日 H時i分s秒", strtotime($memo['update_timestamp'])); ?>
+                        <?php if ($memo['update_timestamp'] != $memo['create_timestamp']) : ?>
+                          <span class="is__edit__memo">（編集済み）</span>
+                        <?php endif; ?>
+                      </p>
+                      <div class="memo__item__explain"><?php echo $parsedown->text($memo['memo']); ?>
+                      </div>
+                    </div>
+
+                    <?php if ($_SESSION['userid'] == $memo['user_id']): ?>
+                      <div class="memo__items__operation">
+                        <?php if (!$editMemoFlg): ?>
+                          <form class="memo__item__change__mode__edit"
+                            action="show_detail.php?task_id=<?= urlencode($_GET["task_id"]) ?>" method="post">
+                            <input type="hidden" value="<?php echo htmlspecialchars($memo['memo'], ENT_QUOTES, 'UTF-8') ?>"
+                              name="memo">
+                            <input type="hidden" value="<?php echo htmlspecialchars($memo['memo_id'], ENT_QUOTES, 'UTF-8') ?>"
+                              name="memo_id">
+                            <input type="hidden" name="task_id"
+                              value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
+                            <button type="submit" class="change__mode__button__edit__memo"
+                              name="change_mode_edit_memo_button">編集</button>
+                          </form>
+                        <?php endif; ?>
+
+                        <form class="memo__item__delete" action="delete_memo.php" method="post">
+                          <input type="hidden" value="<?php echo htmlspecialchars($memo['memo_id'], ENT_QUOTES, 'UTF-8') ?>"
+                            name="memo_id">
+                          <input type="hidden" name="task_id"
+                            value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
+                          <button type="submit" class="button__delete__memo" name="delete_memo_button"><i class="fas fa-trash"
+                              aria-hidden="true"></i></button>
+                        </form>
+                      </div>
+                    <?php endif; ?>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            </div>
+          <?php else: ?>
+            <div class="memo__items">
+              <div class="memo__item">
+                <p class="memo__item__explain">メモはありません。</p>
+              </div>
+            </div>
+          <?php endif; ?>
+
+          <?php if (!$editMemoFlg): ?>
+            <form class="regist__new__memo" action="regist_new_memo.php" method="post">
+              <textarea class="new_memo_text" name="new_memo_text" id="new_memo_text"></textarea>
+              <script>
+                const easyMDE = new EasyMDE({
+                  element: document.getElementById("new_memo_text"),
+                });
+              </script>
+              <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
+              <button name="regist_new_memo">メモを追加</button>
+            </form>
+          <?php elseif ($editMemoFlg): ?>
+            <form class="edit__memo" action="edit_memo.php" method="post">
+              <textarea class="edit_memo_text" name="edit_memo_text"
+                id="edit_memo_text"><?php echo htmlspecialchars($editMemo, ENT_QUOTES, 'UTF-8') ?></textarea>
+              <script>
+                const easyMDE = new EasyMDE({
+                  element: document.getElementById("edit_memo_text"),
+                });
+              </script>
+              <input type="hidden" value="<?php echo htmlspecialchars($editMemoId, ENT_QUOTES, 'UTF-8') ?>"
+                name="edit_memo_id">
+              <input type="hidden" name="task_id" value="<?= htmlspecialchars($_GET["task_id"], ENT_QUOTES, "UTF-8") ?>">
+              <button class="edit__memo__button" name="edit_memo">メモを更新</button>
+            </form>
+          <?php endif; ?>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>
